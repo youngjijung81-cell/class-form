@@ -13,7 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 2026학년도 백영고 교지 편집부 학년별 학급 프로필 & 단체 인터뷰지 수집 앱. 1~3학년 × 12반, 반장이 코드 없이 학년·반을 골라 작성·수정한다. 단체사진 2장(공식/자유)을 비공개 저장소에 올린다. 관리자(교지 편집부)는 비밀번호로 들어가 답변·사진 확인, CSV 내려받기, 저장 기록 되돌리기, 마감을 한다.
 
 ## 플랫폼 식별자 (다른 프로젝트와 섞지 말 것)
-- GitHub: `youngjijung81-cell/class-form` (https://github.com/youngjijung81-cell/class-form), 브랜치 `main`
+- GitHub: `youngjijung81-cell/class-form` (public, https://github.com/youngjijung81-cell/class-form), 브랜치 `main`
 - Vercel: 프로젝트 `class-form`, projectId `prj_X4MHvRoVQ1m53Dd1ALIF5Ng8ZuDc`, orgId `team_iogzRgUzWCusnCB7XCvZNx9O` (youngjijung81-9685)
 - Production URL: https://class-form.vercel.app
 - DB: Vercel Marketplace Neon (`class-form-db`, 무료), 환경변수 `DATABASE_URL`. 스키마는 `scripts/schema.sql`
