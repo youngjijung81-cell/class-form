@@ -11,3 +11,13 @@ export function getSql() {
   }
   return _sql;
 }
+
+/** 읽기 전용 조회가 순간적인 연결 실패로 끝나지 않도록 잠깐 쉬었다가 한 번 더 시도한다. */
+export async function withReadRetry<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch {
+    await new Promise((r) => setTimeout(r, 300 + Math.random() * 400));
+    return fn();
+  }
+}

@@ -17,10 +17,20 @@ export default function Home() {
       const saved = Number(localStorage.getItem('cf_grade'));
       if (saved === 1 || saved === 2 || saved === 3) setGrade(saved);
     } catch {}
-    fetch('/api/status')
-      .then((r) => r.json())
+    const load = async (retry: boolean): Promise<any> => {
+      try {
+        const r = await fetch('/api/status');
+        const d = await r.json();
+        if (!r.ok || d.error) throw new Error(d.error);
+        return d;
+      } catch (e) {
+        if (!retry) throw e;
+        await new Promise((res) => setTimeout(res, 1500));
+        return load(false);
+      }
+    };
+    load(true)
       .then((d) => {
-        if (d.error) throw new Error(d.error);
         setClosed(!!d.closed);
         setStatus(new Map((d.classes as Status[]).map((s) => [`${s.grade}-${s.class_no}`, s])));
       })

@@ -38,7 +38,8 @@ export async function POST(req: Request, { params }: Ctx) {
       uploadedAt: new Date().toISOString(),
     });
     return NextResponse.json({ response: toPublic(row) });
-  } catch {
+  } catch (err) {
+    console.error('/api/responses/[grade]/[classNo]/photo', err);
     return NextResponse.json({ error: '사진을 등록하지 못했습니다.' }, { status: 500 });
   }
 }

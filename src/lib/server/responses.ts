@@ -53,6 +53,17 @@ export async function getRow(grade: number, classNo: number): Promise<ResponseRo
   return (rows[0] as ResponseRow) ?? emptyRow(grade, classNo);
 }
 
+/** 반 내용과 마감 여부를 DB 한 번 조회로 함께 읽는다. */
+export async function getRowWithClosed(grade: number, classNo: number): Promise<{ row: ResponseRow; closed: boolean }> {
+  const sql = getSql();
+  const rows = await sql`
+    select coalesce((select value = 'true' from settings where key = 'closed'), false) as closed,
+      (select to_jsonb(r) from (
+        select grade, class_no, homeroom, writer, answers, photo_official, photo_free, updated_at
+        from responses where grade = ${grade} and class_no = ${classNo}) r) as row`;
+  return { closed: rows[0].closed, row: (rows[0].row as ResponseRow) ?? emptyRow(grade, classNo) };
+}
+
 const RETURNING = 'grade, class_no, homeroom, writer, answers, photo_official, photo_free, updated_at';
 
 /**
