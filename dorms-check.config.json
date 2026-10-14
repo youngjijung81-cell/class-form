@@ -1,0 +1,15 @@
+{
+  "app": {
+    "name": "교지 학급 프로필",
+    "url": "https://class-form.vercel.app",
+    "stack": "Next.js"
+  },
+  "tracks": [
+    "security"
+  ],
+  "edzipCase": null,
+  "teacher": {
+    "dormsHandle": ""
+  },
+  "ownershipConfirmed": true
+}

@@ -1,0 +1,898 @@
+{
+  "at": "2026-10-14T04:24:15.418Z",
+  "url": "https://class-form.vercel.app",
+  "reachable": true,
+  "results": [
+    {
+      "id": "meta.public-surface",
+      "status": "pass",
+      "observed": "공개 HTTPS 응답과 받은 본문을 확인했습니다.",
+      "evidence": {
+        "httpStatus": 200,
+        "finalUrl": "https://class-form.vercel.app/",
+        "transportChecked": true,
+        "bodyChecked": true,
+        "unsafeTransport": false,
+        "bodyTruncated": false
+      }
+    },
+    {
+      "id": "sec.header.csp",
+      "status": "info",
+      "observed": "content-security-policy 보완 권장: 누락",
+      "evidence": {
+        "header": "content-security-policy",
+        "value": null,
+        "validation": "누락",
+        "observedAt": "2026-10-14T04:24:13.897Z"
+      }
+    },
+    {
+      "id": "sec.header.hsts",
+      "status": "pass",
+      "observed": "strict-transport-security 설정 확인",
+      "evidence": {
+        "header": "strict-transport-security",
+        "value": "max-age=63072000; includeSubDomains; preload",
+        "validation": "valid",
+        "observedAt": "2026-10-14T04:24:13.897Z"
+      }
+    },
+    {
+      "id": "sec.header.frame",
+      "status": "pass",
+      "observed": "x-frame-options 설정 확인",
+      "evidence": {
+        "header": "x-frame-options",
+        "value": "DENY",
+        "validation": "x-frame-options: DENY",
+        "observedAt": "2026-10-14T04:24:13.897Z"
+      }
+    },
+    {
+      "id": "sec.header.nosniff",
+      "status": "pass",
+      "observed": "x-content-type-options 설정 확인",
+      "evidence": {
+        "header": "x-content-type-options",
+        "value": "nosniff",
+        "validation": "valid",
+        "observedAt": "2026-10-14T04:24:13.897Z"
+      }
+    },
+    {
+      "id": "sec.header.referrer",
+      "status": "pass",
+      "observed": "referrer-policy 설정 확인",
+      "evidence": {
+        "header": "referrer-policy",
+        "value": "strict-origin-when-cross-origin",
+        "validation": "valid",
+        "observedAt": "2026-10-14T04:24:13.897Z"
+      }
+    },
+    {
+      "id": "sec.header.permissions",
+      "status": "pass",
+      "observed": "permissions-policy 설정 확인",
+      "evidence": {
+        "header": "permissions-policy",
+        "value": "camera=(), microphone=(), geolocation=()",
+        "validation": "valid",
+        "observedAt": "2026-10-14T04:24:13.897Z"
+      }
+    },
+    {
+      "id": "sec.fingerprint.powered-by",
+      "status": "pass",
+      "observed": "x-powered-by 미노출(양호)",
+      "evidence": {
+        "poweredBy": null,
+        "server": "Vercel"
+      }
+    },
+    {
+      "id": "sec.transport.https-redirect",
+      "status": "pass",
+      "observed": "HTTP 308 -> https://class-form.vercel.app/",
+      "evidence": {
+        "redirectsHttps": true
+      }
+    },
+    {
+      "id": "sec.transport.ssl-valid",
+      "status": "pass",
+      "observed": "HTTPS 연결을 확인했습니다.",
+      "evidence": {
+        "authorized": true,
+        "method": "https-response",
+        "protocol": null,
+        "tlsInvalid": false
+      }
+    },
+    {
+      "id": "sec.transport.old-tls",
+      "status": "unknown",
+      "observed": "TLS 세부 버전은 별도로 측정하지 않았습니다.",
+      "evidence": {
+        "protocol": null
+      }
+    },
+    {
+      "id": "sec.transport.cookie-flags",
+      "status": "na",
+      "observed": "응답에 쿠키 없음",
+      "evidence": {}
+    },
+    {
+      "id": "info.secret-exposed",
+      "status": "unknown",
+      "observed": "받은 본문에서 민감정보가 확인되지 않았습니다. 일부 추가 경로는 확인하지 못했습니다.",
+      "evidence": {
+        "probed": [
+          {
+            "path": "/.env",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/.env.local",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/.env.production",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/.git/config",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/.git/HEAD",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/next.config.js",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/vercel.json",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/.npmrc",
+            "httpStatus": 404,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/_next/static/immutable/chunks/0meshd4c712hl.js",
+            "httpStatus": 200,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/_next/static/immutable/chunks/3a741y-wtf_t1.js",
+            "httpStatus": 200,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/_next/static/immutable/chunks/2wf8q9sucf6ll.js",
+            "httpStatus": 200,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/_next/static/immutable/chunks/turbopack-1cvbnb3nlabgn.js",
+            "httpStatus": 200,
+            "exposed": false,
+            "checked": true
+          },
+          {
+            "path": "/_next/static/immutable/chunks/00z4pmesk2f4f.js",
+            "httpStatus": 403,
+            "exposed": false,
+            "checked": false
+          },
+          {
+            "path": "/_next/static/immutable/chunks/1igd--xw24wi9.js",
+            "httpStatus": 403,
+            "exposed": false,
+            "checked": false
+          }
+        ],
+        "exposedPaths": [],
+        "mainBodyChecked": true,
+        "confirmedSensitiveExposure": false
+      }
+    },
+    {
+      "id": "info.config-exposed",
+      "status": "unknown",
+      "observed": "추가로 확인된 설정 자료가 없습니다.",
+      "evidence": {
+        "exposed": []
+      }
+    },
+    {
+      "id": "info.source-map",
+      "status": "pass",
+      "observed": "소스맵 참조 없음",
+      "evidence": {
+        "sourceMappingURL": false
+      }
+    },
+    {
+      "id": "info.stack-trace",
+      "status": "pass",
+      "observed": "스택트레이스 노출 없음",
+      "evidence": {
+        "stackTrace": false
+      }
+    },
+    {
+      "id": "info.mixed-content",
+      "status": "pass",
+      "observed": "mixed content 없음",
+      "evidence": {
+        "mixedContent": false
+      }
+    },
+    {
+      "id": "cors.policy",
+      "status": "info",
+      "observed": "와일드카드(*) 허용 — 공개 API면 무방, 인증 API면 위험",
+      "evidence": {
+        "allowOrigin": "*",
+        "allowCredentials": false,
+        "reflectsOrigin": false,
+        "wildcard": true
+      }
+    },
+    {
+      "id": "legal.privacy-policy",
+      "status": "unknown",
+      "observed": "받은 HTML과 확인한 주소에서 방침을 찾지 못했습니다. 앱 안 팝업이나 로그인 뒤 화면은 확인하지 않았습니다.",
+      "evidence": {
+        "found": false
+      }
+    },
+    {
+      "id": "legal.terms",
+      "status": "info",
+      "observed": "이용약관 페이지/링크 없음",
+      "evidence": {
+        "found": false
+      }
+    },
+    {
+      "id": "legal.contact",
+      "status": "pass",
+      "observed": "연락처/문의 정보 있음",
+      "evidence": {
+        "found": true
+      }
+    },
+    {
+      "id": "seo.title",
+      "status": "pass",
+      "observed": "<title> 있음",
+      "evidence": {}
+    },
+    {
+      "id": "seo.description",
+      "status": "pass",
+      "observed": "설명 메타",
+      "evidence": {}
+    },
+    {
+      "id": "seo.viewport",
+      "status": "pass",
+      "observed": "viewport 메타",
+      "evidence": {}
+    },
+    {
+      "id": "seo.og",
+      "status": "info",
+      "observed": "Open Graph 태그",
+      "evidence": {}
+    },
+    {
+      "id": "seo.canonical",
+      "status": "info",
+      "observed": "canonical 링크",
+      "evidence": {}
+    },
+    {
+      "id": "perf.ttfb",
+      "status": "pass",
+      "observed": "응답 시간 117ms",
+      "evidence": {
+        "ms": 117
+      }
+    },
+    {
+      "id": "perf.page-size",
+      "status": "pass",
+      "observed": "문서 크기 12KB",
+      "evidence": {
+        "bytes": 12256
+      }
+    },
+    {
+      "id": "perf.compression",
+      "status": "pass",
+      "observed": "압축: br",
+      "evidence": {
+        "encoding": "br"
+      }
+    },
+    {
+      "id": "code.rls.anon-read",
+      "status": "unknown",
+      "observed": "공개 응답에서 점검에 필요한 DB 주소와 공개 키를 찾지 못했습니다. 내부 데이터 접근 권한은 확인하지 않았습니다.",
+      "evidence": {
+        "providerDetected": false,
+        "foundJwts": 0
+      }
+    },
+    {
+      "id": "code.firebase.public-read",
+      "status": "unknown",
+      "observed": "공개 응답에서 Firebase 실시간 DB 주소를 찾지 못했습니다. 내부 접근 권한은 확인하지 않았습니다.",
+      "evidence": {
+        "providerDetected": false
+      }
+    },
+    {
+      "id": "code.endpoint.unauth",
+      "status": "unknown",
+      "observed": "공개 응답에서 점검할 내부 API 경로를 찾지 못했습니다.",
+      "evidence": {}
+    },
+    {
+      "id": "code.hardcoded-secret",
+      "status": "pass",
+      "observed": "하드코딩 시크릿 미검출",
+      "evidence": {
+        "hits": [],
+        "inspectedFiles": 33,
+        "readFailures": 0
+      }
+    },
+    {
+      "id": "code.client-secret-leak",
+      "status": "pass",
+      "observed": "클라 시크릿 노출 미검출",
+      "evidence": {
+        "hits": [],
+        "inspectedFiles": 26,
+        "readFailures": 0
+      }
+    },
+    {
+      "id": "code.headers-config",
+      "status": "info",
+      "observed": "헤더 설정 발견: x-frame-options, x-content-type-options, referrer-policy, permissions-policy",
+      "evidence": {
+        "configuredHeaders": {
+          "x-frame-options": [
+            "next.config.ts"
+          ],
+          "x-content-type-options": [
+            "next.config.ts"
+          ],
+          "referrer-policy": [
+            "next.config.ts"
+          ],
+          "permissions-policy": [
+            "next.config.ts"
+          ]
+        },
+        "filesScanned": [
+          "next.config.ts",
+          "vercel.json"
+        ]
+      }
+    },
+    {
+      "id": "code.dangerous-pattern",
+      "status": "pass",
+      "observed": "위험 코드 패턴 미검출",
+      "evidence": {
+        "hits": []
+      }
+    }
+  ],
+  "bonus": [],
+  "raw": {
+    "url": "https://class-form.vercel.app",
+    "finalUrl": "https://class-form.vercel.app/",
+    "httpStatus": 200,
+    "publicSurface": {
+      "httpStatus": 200,
+      "finalUrl": "https://class-form.vercel.app/",
+      "transportChecked": true,
+      "bodyChecked": true,
+      "unsafeTransport": false,
+      "bodyTruncated": false
+    },
+    "scannedAt": "2026-10-14T04:24:13.896Z",
+    "ttfbMs": 117,
+    "observedHeaders": [
+      "access-control-allow-origin",
+      "age",
+      "cache-control",
+      "content-disposition",
+      "content-encoding",
+      "content-type",
+      "date",
+      "etag",
+      "permissions-policy",
+      "referrer-policy",
+      "server",
+      "strict-transport-security",
+      "transfer-encoding",
+      "vary",
+      "x-content-type-options",
+      "x-frame-options",
+      "x-matched-path",
+      "x-nextjs-prerender",
+      "x-nextjs-stale-time",
+      "x-vercel-cache",
+      "x-vercel-id"
+    ]
+  },
+  "trackResults": {
+    "security": {
+      "eligible": true,
+      "outcome": "eligible",
+      "items": [
+        {
+          "id": "meta.public-surface",
+          "status": "pass",
+          "observed": "공개 HTTPS 응답과 받은 본문을 확인했습니다.",
+          "evidence": {
+            "httpStatus": 200,
+            "finalUrl": "https://class-form.vercel.app/",
+            "transportChecked": true,
+            "bodyChecked": true,
+            "unsafeTransport": false,
+            "bodyTruncated": false
+          }
+        },
+        {
+          "id": "sec.header.csp",
+          "status": "info",
+          "observed": "content-security-policy 보완 권장: 누락",
+          "evidence": {
+            "header": "content-security-policy",
+            "value": null,
+            "validation": "누락",
+            "observedAt": "2026-10-14T04:24:13.897Z"
+          }
+        },
+        {
+          "id": "sec.header.hsts",
+          "status": "pass",
+          "observed": "strict-transport-security 설정 확인",
+          "evidence": {
+            "header": "strict-transport-security",
+            "value": "max-age=63072000; includeSubDomains; preload",
+            "validation": "valid",
+            "observedAt": "2026-10-14T04:24:13.897Z"
+          }
+        },
+        {
+          "id": "sec.header.frame",
+          "status": "pass",
+          "observed": "x-frame-options 설정 확인",
+          "evidence": {
+            "header": "x-frame-options",
+            "value": "DENY",
+            "validation": "x-frame-options: DENY",
+            "observedAt": "2026-10-14T04:24:13.897Z"
+          }
+        },
+        {
+          "id": "sec.header.nosniff",
+          "status": "pass",
+          "observed": "x-content-type-options 설정 확인",
+          "evidence": {
+            "header": "x-content-type-options",
+            "value": "nosniff",
+            "validation": "valid",
+            "observedAt": "2026-10-14T04:24:13.897Z"
+          }
+        },
+        {
+          "id": "sec.header.referrer",
+          "status": "pass",
+          "observed": "referrer-policy 설정 확인",
+          "evidence": {
+            "header": "referrer-policy",
+            "value": "strict-origin-when-cross-origin",
+            "validation": "valid",
+            "observedAt": "2026-10-14T04:24:13.897Z"
+          }
+        },
+        {
+          "id": "sec.header.permissions",
+          "status": "pass",
+          "observed": "permissions-policy 설정 확인",
+          "evidence": {
+            "header": "permissions-policy",
+            "value": "camera=(), microphone=(), geolocation=()",
+            "validation": "valid",
+            "observedAt": "2026-10-14T04:24:13.897Z"
+          }
+        },
+        {
+          "id": "sec.fingerprint.powered-by",
+          "status": "pass",
+          "observed": "x-powered-by 미노출(양호)",
+          "evidence": {
+            "poweredBy": null,
+            "server": "Vercel"
+          }
+        },
+        {
+          "id": "sec.transport.https-redirect",
+          "status": "pass",
+          "observed": "HTTP 308 -> https://class-form.vercel.app/",
+          "evidence": {
+            "redirectsHttps": true
+          }
+        },
+        {
+          "id": "sec.transport.ssl-valid",
+          "status": "pass",
+          "observed": "HTTPS 연결을 확인했습니다.",
+          "evidence": {
+            "authorized": true,
+            "method": "https-response",
+            "protocol": null,
+            "tlsInvalid": false
+          }
+        },
+        {
+          "id": "sec.transport.old-tls",
+          "status": "unknown",
+          "observed": "TLS 세부 버전은 별도로 측정하지 않았습니다.",
+          "evidence": {
+            "protocol": null
+          }
+        },
+        {
+          "id": "sec.transport.cookie-flags",
+          "status": "na",
+          "observed": "응답에 쿠키 없음",
+          "evidence": {}
+        },
+        {
+          "id": "info.secret-exposed",
+          "status": "unknown",
+          "observed": "받은 본문에서 민감정보가 확인되지 않았습니다. 일부 추가 경로는 확인하지 못했습니다.",
+          "evidence": {
+            "probed": [
+              {
+                "path": "/.env",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/.env.local",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/.env.production",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/.git/config",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/.git/HEAD",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/next.config.js",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/vercel.json",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/.npmrc",
+                "httpStatus": 404,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/_next/static/immutable/chunks/0meshd4c712hl.js",
+                "httpStatus": 200,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/_next/static/immutable/chunks/3a741y-wtf_t1.js",
+                "httpStatus": 200,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/_next/static/immutable/chunks/2wf8q9sucf6ll.js",
+                "httpStatus": 200,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/_next/static/immutable/chunks/turbopack-1cvbnb3nlabgn.js",
+                "httpStatus": 200,
+                "exposed": false,
+                "checked": true
+              },
+              {
+                "path": "/_next/static/immutable/chunks/00z4pmesk2f4f.js",
+                "httpStatus": 403,
+                "exposed": false,
+                "checked": false
+              },
+              {
+                "path": "/_next/static/immutable/chunks/1igd--xw24wi9.js",
+                "httpStatus": 403,
+                "exposed": false,
+                "checked": false
+              }
+            ],
+            "exposedPaths": [],
+            "mainBodyChecked": true,
+            "confirmedSensitiveExposure": false
+          }
+        },
+        {
+          "id": "info.config-exposed",
+          "status": "unknown",
+          "observed": "추가로 확인된 설정 자료가 없습니다.",
+          "evidence": {
+            "exposed": []
+          }
+        },
+        {
+          "id": "info.source-map",
+          "status": "pass",
+          "observed": "소스맵 참조 없음",
+          "evidence": {
+            "sourceMappingURL": false
+          }
+        },
+        {
+          "id": "info.stack-trace",
+          "status": "pass",
+          "observed": "스택트레이스 노출 없음",
+          "evidence": {
+            "stackTrace": false
+          }
+        },
+        {
+          "id": "info.mixed-content",
+          "status": "pass",
+          "observed": "mixed content 없음",
+          "evidence": {
+            "mixedContent": false
+          }
+        },
+        {
+          "id": "cors.policy",
+          "status": "info",
+          "observed": "와일드카드(*) 허용 — 공개 API면 무방, 인증 API면 위험",
+          "evidence": {
+            "allowOrigin": "*",
+            "allowCredentials": false,
+            "reflectsOrigin": false,
+            "wildcard": true
+          }
+        },
+        {
+          "id": "legal.privacy-policy",
+          "status": "unknown",
+          "observed": "받은 HTML과 확인한 주소에서 방침을 찾지 못했습니다. 앱 안 팝업이나 로그인 뒤 화면은 확인하지 않았습니다.",
+          "evidence": {
+            "found": false
+          }
+        },
+        {
+          "id": "legal.terms",
+          "status": "info",
+          "observed": "이용약관 페이지/링크 없음",
+          "evidence": {
+            "found": false
+          }
+        },
+        {
+          "id": "legal.contact",
+          "status": "pass",
+          "observed": "연락처/문의 정보 있음",
+          "evidence": {
+            "found": true
+          }
+        },
+        {
+          "id": "seo.title",
+          "status": "pass",
+          "observed": "<title> 있음",
+          "evidence": {}
+        },
+        {
+          "id": "seo.description",
+          "status": "pass",
+          "observed": "설명 메타",
+          "evidence": {}
+        },
+        {
+          "id": "seo.viewport",
+          "status": "pass",
+          "observed": "viewport 메타",
+          "evidence": {}
+        },
+        {
+          "id": "seo.og",
+          "status": "info",
+          "observed": "Open Graph 태그",
+          "evidence": {}
+        },
+        {
+          "id": "seo.canonical",
+          "status": "info",
+          "observed": "canonical 링크",
+          "evidence": {}
+        },
+        {
+          "id": "perf.ttfb",
+          "status": "pass",
+          "observed": "응답 시간 117ms",
+          "evidence": {
+            "ms": 117
+          }
+        },
+        {
+          "id": "perf.page-size",
+          "status": "pass",
+          "observed": "문서 크기 12KB",
+          "evidence": {
+            "bytes": 12256
+          }
+        },
+        {
+          "id": "perf.compression",
+          "status": "pass",
+          "observed": "압축: br",
+          "evidence": {
+            "encoding": "br"
+          }
+        },
+        {
+          "id": "code.rls.anon-read",
+          "status": "unknown",
+          "observed": "공개 응답에서 점검에 필요한 DB 주소와 공개 키를 찾지 못했습니다. 내부 데이터 접근 권한은 확인하지 않았습니다.",
+          "evidence": {
+            "providerDetected": false,
+            "foundJwts": 0
+          }
+        },
+        {
+          "id": "code.firebase.public-read",
+          "status": "unknown",
+          "observed": "공개 응답에서 Firebase 실시간 DB 주소를 찾지 못했습니다. 내부 접근 권한은 확인하지 않았습니다.",
+          "evidence": {
+            "providerDetected": false
+          }
+        },
+        {
+          "id": "code.endpoint.unauth",
+          "status": "unknown",
+          "observed": "공개 응답에서 점검할 내부 API 경로를 찾지 못했습니다.",
+          "evidence": {}
+        },
+        {
+          "id": "code.hardcoded-secret",
+          "status": "pass",
+          "observed": "하드코딩 시크릿 미검출",
+          "evidence": {
+            "hits": [],
+            "inspectedFiles": 33,
+            "readFailures": 0
+          }
+        },
+        {
+          "id": "code.client-secret-leak",
+          "status": "pass",
+          "observed": "클라 시크릿 노출 미검출",
+          "evidence": {
+            "hits": [],
+            "inspectedFiles": 26,
+            "readFailures": 0
+          }
+        },
+        {
+          "id": "code.headers-config",
+          "status": "info",
+          "observed": "헤더 설정 발견: x-frame-options, x-content-type-options, referrer-policy, permissions-policy",
+          "evidence": {
+            "configuredHeaders": {
+              "x-frame-options": [
+                "next.config.ts"
+              ],
+              "x-content-type-options": [
+                "next.config.ts"
+              ],
+              "referrer-policy": [
+                "next.config.ts"
+              ],
+              "permissions-policy": [
+                "next.config.ts"
+              ]
+            },
+            "filesScanned": [
+              "next.config.ts",
+              "vercel.json"
+            ]
+          }
+        },
+        {
+          "id": "code.dangerous-pattern",
+          "status": "pass",
+          "observed": "위험 코드 패턴 미검출",
+          "evidence": {
+            "hits": []
+          }
+        }
+      ],
+      "blockingFails": [],
+      "coverage": {
+        "checked": 28,
+        "unverified": 7,
+        "notApplicable": 1
+      },
+      "policyVersion": "minimum-2026-09-15",
+      "score": null,
+      "grade": null,
+      "failingBySeverity": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    }
+  }
+}
