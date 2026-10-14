@@ -16,6 +16,22 @@
         },
         "blocking": []
       }
+    },
+    {
+      "n": 2,
+      "at": "2026-10-14T05:11:26.105Z",
+      "security": {
+        "score": null,
+        "grade": null,
+        "eligible": true,
+        "outcome": "eligible",
+        "coverage": {
+          "checked": 28,
+          "unverified": 7,
+          "notApplicable": 1
+        },
+        "blocking": []
+      }
     }
   ],
   "items": {

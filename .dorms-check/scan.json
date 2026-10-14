@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-14T04:24:15.418Z",
+  "at": "2026-10-14T05:11:26.110Z",
   "url": "https://class-form.vercel.app",
   "reachable": true,
   "results": [
@@ -24,7 +24,7 @@
         "header": "content-security-policy",
         "value": null,
         "validation": "누락",
-        "observedAt": "2026-10-14T04:24:13.897Z"
+        "observedAt": "2026-10-14T05:11:25.115Z"
       }
     },
     {
@@ -35,7 +35,7 @@
         "header": "strict-transport-security",
         "value": "max-age=63072000; includeSubDomains; preload",
         "validation": "valid",
-        "observedAt": "2026-10-14T04:24:13.897Z"
+        "observedAt": "2026-10-14T05:11:25.115Z"
       }
     },
     {
@@ -46,7 +46,7 @@
         "header": "x-frame-options",
         "value": "DENY",
         "validation": "x-frame-options: DENY",
-        "observedAt": "2026-10-14T04:24:13.897Z"
+        "observedAt": "2026-10-14T05:11:25.115Z"
       }
     },
     {
@@ -57,7 +57,7 @@
         "header": "x-content-type-options",
         "value": "nosniff",
         "validation": "valid",
-        "observedAt": "2026-10-14T04:24:13.897Z"
+        "observedAt": "2026-10-14T05:11:25.115Z"
       }
     },
     {
@@ -68,7 +68,7 @@
         "header": "referrer-policy",
         "value": "strict-origin-when-cross-origin",
         "validation": "valid",
-        "observedAt": "2026-10-14T04:24:13.897Z"
+        "observedAt": "2026-10-14T05:11:25.115Z"
       }
     },
     {
@@ -79,7 +79,7 @@
         "header": "permissions-policy",
         "value": "camera=(), microphone=(), geolocation=()",
         "validation": "valid",
-        "observedAt": "2026-10-14T04:24:13.897Z"
+        "observedAt": "2026-10-14T05:11:25.115Z"
       }
     },
     {
@@ -185,22 +185,22 @@
             "checked": true
           },
           {
-            "path": "/_next/static/immutable/chunks/3a741y-wtf_t1.js",
+            "path": "/_next/static/immutable/chunks/1-11mn11o1rcd.js",
             "httpStatus": 200,
             "exposed": false,
             "checked": true
           },
           {
             "path": "/_next/static/immutable/chunks/2wf8q9sucf6ll.js",
-            "httpStatus": 200,
+            "httpStatus": 403,
             "exposed": false,
-            "checked": true
+            "checked": false
           },
           {
             "path": "/_next/static/immutable/chunks/turbopack-1cvbnb3nlabgn.js",
-            "httpStatus": 200,
+            "httpStatus": 403,
             "exposed": false,
-            "checked": true
+            "checked": false
           },
           {
             "path": "/_next/static/immutable/chunks/00z4pmesk2f4f.js",
@@ -209,7 +209,7 @@
             "checked": false
           },
           {
-            "path": "/_next/static/immutable/chunks/1igd--xw24wi9.js",
+            "path": "/_next/static/immutable/chunks/31iyiq9vi9nt0.js",
             "httpStatus": 403,
             "exposed": false,
             "checked": false
@@ -320,9 +320,9 @@
     {
       "id": "perf.ttfb",
       "status": "pass",
-      "observed": "응답 시간 117ms",
+      "observed": "응답 시간 168ms",
       "evidence": {
-        "ms": 117
+        "ms": 168
       }
     },
     {
@@ -330,7 +330,7 @@
       "status": "pass",
       "observed": "문서 크기 12KB",
       "evidence": {
-        "bytes": 12256
+        "bytes": 11972
       }
     },
     {
@@ -370,7 +370,7 @@
       "observed": "하드코딩 시크릿 미검출",
       "evidence": {
         "hits": [],
-        "inspectedFiles": 33,
+        "inspectedFiles": 37,
         "readFailures": 0
       }
     },
@@ -380,7 +380,7 @@
       "observed": "클라 시크릿 노출 미검출",
       "evidence": {
         "hits": [],
-        "inspectedFiles": 26,
+        "inspectedFiles": 30,
         "readFailures": 0
       }
     },
@@ -431,8 +431,8 @@
       "unsafeTransport": false,
       "bodyTruncated": false
     },
-    "scannedAt": "2026-10-14T04:24:13.896Z",
-    "ttfbMs": 117,
+    "scannedAt": "2026-10-14T05:11:25.113Z",
+    "ttfbMs": 168,
     "observedHeaders": [
       "access-control-allow-origin",
       "age",
@@ -483,7 +483,7 @@
             "header": "content-security-policy",
             "value": null,
             "validation": "누락",
-            "observedAt": "2026-10-14T04:24:13.897Z"
+            "observedAt": "2026-10-14T05:11:25.115Z"
           }
         },
         {
@@ -494,7 +494,7 @@
             "header": "strict-transport-security",
             "value": "max-age=63072000; includeSubDomains; preload",
             "validation": "valid",
-            "observedAt": "2026-10-14T04:24:13.897Z"
+            "observedAt": "2026-10-14T05:11:25.115Z"
           }
         },
         {
@@ -505,7 +505,7 @@
             "header": "x-frame-options",
             "value": "DENY",
             "validation": "x-frame-options: DENY",
-            "observedAt": "2026-10-14T04:24:13.897Z"
+            "observedAt": "2026-10-14T05:11:25.115Z"
           }
         },
         {
@@ -516,7 +516,7 @@
             "header": "x-content-type-options",
             "value": "nosniff",
             "validation": "valid",
-            "observedAt": "2026-10-14T04:24:13.897Z"
+            "observedAt": "2026-10-14T05:11:25.115Z"
           }
         },
         {
@@ -527,7 +527,7 @@
             "header": "referrer-policy",
             "value": "strict-origin-when-cross-origin",
             "validation": "valid",
-            "observedAt": "2026-10-14T04:24:13.897Z"
+            "observedAt": "2026-10-14T05:11:25.115Z"
           }
         },
         {
@@ -538,7 +538,7 @@
             "header": "permissions-policy",
             "value": "camera=(), microphone=(), geolocation=()",
             "validation": "valid",
-            "observedAt": "2026-10-14T04:24:13.897Z"
+            "observedAt": "2026-10-14T05:11:25.115Z"
           }
         },
         {
@@ -644,22 +644,22 @@
                 "checked": true
               },
               {
-                "path": "/_next/static/immutable/chunks/3a741y-wtf_t1.js",
+                "path": "/_next/static/immutable/chunks/1-11mn11o1rcd.js",
                 "httpStatus": 200,
                 "exposed": false,
                 "checked": true
               },
               {
                 "path": "/_next/static/immutable/chunks/2wf8q9sucf6ll.js",
-                "httpStatus": 200,
+                "httpStatus": 403,
                 "exposed": false,
-                "checked": true
+                "checked": false
               },
               {
                 "path": "/_next/static/immutable/chunks/turbopack-1cvbnb3nlabgn.js",
-                "httpStatus": 200,
+                "httpStatus": 403,
                 "exposed": false,
-                "checked": true
+                "checked": false
               },
               {
                 "path": "/_next/static/immutable/chunks/00z4pmesk2f4f.js",
@@ -668,7 +668,7 @@
                 "checked": false
               },
               {
-                "path": "/_next/static/immutable/chunks/1igd--xw24wi9.js",
+                "path": "/_next/static/immutable/chunks/31iyiq9vi9nt0.js",
                 "httpStatus": 403,
                 "exposed": false,
                 "checked": false
@@ -779,9 +779,9 @@
         {
           "id": "perf.ttfb",
           "status": "pass",
-          "observed": "응답 시간 117ms",
+          "observed": "응답 시간 168ms",
           "evidence": {
-            "ms": 117
+            "ms": 168
           }
         },
         {
@@ -789,7 +789,7 @@
           "status": "pass",
           "observed": "문서 크기 12KB",
           "evidence": {
-            "bytes": 12256
+            "bytes": 11972
           }
         },
         {
@@ -829,7 +829,7 @@
           "observed": "하드코딩 시크릿 미검출",
           "evidence": {
             "hits": [],
-            "inspectedFiles": 33,
+            "inspectedFiles": 37,
             "readFailures": 0
           }
         },
@@ -839,7 +839,7 @@
           "observed": "클라 시크릿 노출 미검출",
           "evidence": {
             "hits": [],
-            "inspectedFiles": 26,
+            "inspectedFiles": 30,
             "readFailures": 0
           }
         },
