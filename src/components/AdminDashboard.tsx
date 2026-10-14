@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   const [closed, setClosed] = useState(false);
   const [grade, setGrade] = useState<1 | 2 | 3>(1);
   const [open, setOpen] = useState<{ grade: 1 | 2 | 3; classNo: number } | null>(null);
-  const [codes, setCodes] = useState<Map<string, string>>(new Map());
+  const [codes, setCodes] = useState<Map<string, { code: string; claimed: boolean }>>(new Map());
   const [showSheet, setShowSheet] = useState(false);
 
   const load = useCallback(async () => {
@@ -47,18 +47,22 @@ export default function AdminDashboard() {
     setClosed(!!d.closed);
     setRows(new Map((d.responses as Row[]).map((r) => [`${r.grade}-${r.class_no}`, r])));
     const c = await fetch('/api/admin/codes', { cache: 'no-store' }).then((r) => r.json());
-    setCodes(new Map(((c.codes ?? []) as { grade: number; class_no: number; code: string }[]).map((x) => [`${x.grade}-${x.class_no}`, x.code])));
+    setCodes(new Map(((c.codes ?? []) as { grade: number; class_no: number; code: string; claimed_at: string | null }[]).map((x) => [`${x.grade}-${x.class_no}`, { code: x.code, claimed: !!x.claimed_at }])));
   }, []);
 
-  const reissue = async (g: number, c: number) => {
-    if (!confirm(`${g}학년 ${c}반 코드를 새로 바꿀까요?\n예전 코드는 더 이상 쓸 수 없고, 이미 들어와 있던 기기도 새 코드를 다시 입력해야 해요.`)) return;
+  const changeCode = async (g: number, c: number, action: 'reissue' | 'reset') => {
+    const msg =
+      action === 'reset'
+        ? `${g}학년 ${c}반을 "시작 전"으로 되돌릴까요?\n지금 코드로 들어와 있던 기기는 모두 막히고, 다음에 처음 들어오는 학생이 새 코드를 받아요.\n(작성된 내용은 지워지지 않아요.)`
+        : `${g}학년 ${c}반 코드를 새로 바꿀까요?\n예전 코드는 쓸 수 없게 되고, 이미 들어와 있던 기기도 새 코드를 다시 입력해야 해요.`;
+    if (!confirm(msg)) return;
     const res = await fetch('/api/admin/codes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ grade: g, classNo: c }),
+      body: JSON.stringify({ grade: g, classNo: c, action }),
     });
     const d = await res.json();
-    if (res.ok) setCodes((m) => new Map(m).set(`${g}-${c}`, d.code));
+    if (res.ok) setCodes((m) => new Map(m).set(`${g}-${c}`, { code: d.code, claimed: !!d.claimed_at }));
     else alert(d.error || '바꾸지 못했어요.');
   };
 
@@ -136,7 +140,7 @@ export default function AdminDashboard() {
           전체 답변 엑셀(CSV) 받기
         </a>
         <button onClick={() => setShowSheet(true)} className="rounded-lg border border-ink px-4 py-2 text-sm font-bold">
-          반 코드표 보기·인쇄
+          반 코드 전체 보기
         </button>
         <button onClick={toggleClosed} className={`rounded-lg px-4 py-2 text-sm font-bold ${closed ? 'bg-ok text-white' : 'border border-accent text-accent'}`}>
           {closed ? '마감 풀기' : '제출 마감하기'}
@@ -180,10 +184,19 @@ export default function AdminDashboard() {
                 <tr key={c} className="border-t border-line">
                   <td className="px-3 py-2 font-bold">{c}반</td>
                   <td className="px-3 py-2 whitespace-nowrap">
-                    <span className="font-mono font-bold tracking-wider">{codes.get(`${grade}-${c}`) ?? '-'}</span>
-                    <button onClick={() => reissue(grade, c)} className="ml-2 text-xs text-muted underline underline-offset-2">
-                      새 코드
-                    </button>
+                    {codes.get(`${grade}-${c}`)?.claimed ? (
+                      <>
+                        <span className="font-mono font-bold tracking-wider">{codes.get(`${grade}-${c}`)?.code}</span>
+                        <button onClick={() => changeCode(grade, c, 'reissue')} className="ml-2 text-xs text-muted underline underline-offset-2">
+                          새 코드
+                        </button>
+                        <button onClick={() => changeCode(grade, c, 'reset')} className="ml-2 text-xs text-accent underline underline-offset-2">
+                          초기화
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-xs text-muted">시작 전</span>
+                    )}
                   </td>
                   <td className="px-3 py-2">{r?.homeroom || '-'}</td>
                   <td className="px-3 py-2">{r?.writer || '-'}</td>
@@ -215,7 +228,7 @@ export default function AdminDashboard() {
   );
 }
 
-function CodeSheet({ codes, onClose }: { codes: Map<string, string>; onClose: () => void }) {
+function CodeSheet({ codes, onClose }: { codes: Map<string, { code: string; claimed: boolean }>; onClose: () => void }) {
   const site = typeof window !== 'undefined' ? window.location.origin : '';
   return (
     <div className="min-h-screen bg-white">
@@ -229,7 +242,7 @@ function CodeSheet({ codes, onClose }: { codes: Map<string, string>; onClose: ()
             닫기
           </button>
         </div>
-        <p className="mt-2 text-sm text-muted print:hidden">점선을 따라 잘라 각 반 회장에게 나눠 주세요. 다른 반에 코드가 알려지면 관리 화면에서 &quot;새 코드&quot;로 바꾸면 돼요.</p>
+        <p className="mt-2 text-sm text-muted print:hidden">학생이 처음 들어오면 코드가 만들어져요. 코드를 잃어버린 반에 알려 줄 때 쓰세요. 다른 반에 알려졌으면 &quot;새 코드&quot;, 다른 반 학생이 먼저 시작했으면 &quot;초기화&quot;를 누르세요.</p>
         {GRADES.map((g) => (
           <section key={g} className="mt-6 break-inside-avoid">
             <h3 className="font-bold">{g}학년</h3>
@@ -239,7 +252,7 @@ function CodeSheet({ codes, onClose }: { codes: Map<string, string>; onClose: ()
                   <p className="text-sm font-bold">
                     {g}학년 {c}반 교지 학급 프로필
                   </p>
-                  <p className="mt-1 font-mono text-2xl font-bold tracking-[0.25em]">{codes.get(`${g}-${c}`) ?? '-'}</p>
+                  <p className="mt-1 font-mono text-2xl font-bold tracking-[0.25em]">{codes.get(`${g}-${c}`)?.claimed ? codes.get(`${g}-${c}`)?.code : <span className="text-sm font-normal tracking-normal text-gray-500">아직 시작 전</span>}</p>
                   <p className="mt-1 break-all text-xs text-gray-600">{site.replace(/^https?:\/\//, '')}</p>
                 </div>
               ))}

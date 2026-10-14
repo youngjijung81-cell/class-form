@@ -34,3 +34,6 @@ create table if not exists class_codes (
   created_at timestamptz not null default now(),
   primary key (grade, class_no)
 );
+
+-- 처음 들어온 학생이 그 반을 시작(코드 발급)한 시각. null이면 아직 아무도 시작하지 않은 반.
+alter table class_codes add column if not exists claimed_at timestamptz;

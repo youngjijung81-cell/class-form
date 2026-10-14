@@ -47,6 +47,9 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
   const [conflict, setConflict] = useState<Resp | null>(null);
   const [draft, setDraft] = useState<Text | null>(null);
   const [needCode, setNeedCode] = useState(false);
+  const [claimed, setClaimed] = useState(true);
+  const [newCode, setNewCode] = useState<string | null>(null);
+  const [shownCode, setShownCode] = useState<string | null>(null);
 
   const dirty = !sameText(text, saved);
 
@@ -65,6 +68,7 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
       .then(async (r) => {
         const d = await r.json();
         if (r.status === 401 && d.needCode) {
+          setClaimed(d.claimed !== false);
           setNeedCode(true);
           return;
         }
@@ -143,8 +147,26 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
   const setAnswer = (i: number, v: string) =>
     setText((t) => ({ ...t, answers: t.answers.map((a, j) => (j === i ? v : a)) }));
 
+  if (newCode) {
+    return (
+      <CodeReveal
+        grade={grade}
+        classNo={classNo}
+        code={newCode}
+        onDone={() => {
+          setNewCode(null);
+          loadData();
+        }}
+      />
+    );
+  }
+
   if (needCode) {
-    return <CodeGate grade={grade} classNo={classNo} onPass={loadData} />;
+    return claimed ? (
+      <CodeGate grade={grade} classNo={classNo} onPass={loadData} />
+    ) : (
+      <StartGate grade={grade} classNo={classNo} onClaimed={setNewCode} onAlreadyClaimed={() => setClaimed(true)} />
+    );
   }
 
   if (loading) {
@@ -162,9 +184,27 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
       <h1 className="mt-1 text-2xl font-bold leading-snug sm:text-3xl">
         {grade}학년 {classNo}반 · {form.title.replace('학급 비밀 보고서: ', '')}
       </h1>
-      <p className="mt-2 text-sm text-muted">
-        {updatedAt ? `마지막 저장: ${fmtTime(updatedAt)}` : '아직 저장된 내용이 없어요.'}
-      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+        <span>{updatedAt ? `마지막 저장: ${fmtTime(updatedAt)}` : '아직 저장된 내용이 없어요.'}</span>
+        <button
+          className="rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink"
+          onClick={async () => {
+            if (shownCode) return setShownCode(null);
+            const r = await fetch(`/api/class-code/${grade}/${classNo}`, { cache: 'no-store' });
+            const d = await r.json().catch(() => ({}));
+            if (r.ok) setShownCode(d.code);
+            else setMessage({ kind: 'error', text: '코드를 불러오지 못했어요.' });
+          }}
+        >
+          🔑 {shownCode ? '코드 숨기기' : '우리 반 코드 보기'}
+        </button>
+      </div>
+      {shownCode && (
+        <div className="mt-3 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3">
+          <p className="text-xs text-muted">우리 반 코드 · 다른 기기에서 들어오거나 같은 반 친구와 함께 쓸 때 입력해요</p>
+          <p className="mt-1 font-mono text-2xl font-bold tracking-[0.3em] text-accent">{shownCode}</p>
+        </div>
+      )}
 
       {loadError && <Banner tone="error">{loadError}</Banner>}
       {closed && <Banner tone="error">제출이 마감되었어요. 내용을 볼 수만 있어요.</Banner>}
@@ -304,6 +344,104 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
   );
 }
 
+function StartGate({
+  grade,
+  classNo,
+  onClaimed,
+  onAlreadyClaimed,
+}: {
+  grade: number;
+  classNo: number;
+  onClaimed: (code: string) => void;
+  onAlreadyClaimed: () => void;
+}) {
+  const [agree, setAgree] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const start = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const res = await fetch('/api/class-claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade, classNo }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.status === 409) {
+        alert(d.error);
+        return onAlreadyClaimed();
+      }
+      if (!res.ok) throw new Error(d.error || '시작하지 못했어요.');
+      onClaimed(d.code);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <main className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
+      <Link href="/" className="text-sm text-muted hover:text-ink">
+        ← 반 고르기로 돌아가기
+      </Link>
+      <div className="mt-6 rounded-2xl border border-line bg-card p-6 shadow-sm">
+        <p className="text-sm font-semibold text-accent">2026학년도 백영고 교지</p>
+        <h1 className="mt-1 text-2xl font-bold">
+          {grade}학년 {classNo}반
+        </h1>
+        <p className="mt-3 leading-relaxed">아직 아무도 시작하지 않은 반이에요.</p>
+        <ul className="mt-3 space-y-1.5 text-sm leading-relaxed text-muted">
+          <li>• 시작하면 <b className="text-ink">우리 반 코드</b>가 만들어져요.</li>
+          <li>• 그 코드가 있어야 다음에 다시 들어오거나 다른 기기에서 이어 쓸 수 있어요.</li>
+          <li>• 우리 반 회장(또는 대표 친구)이 시작해 주세요.</li>
+        </ul>
+        <label className="mt-5 flex items-start gap-2 rounded-xl bg-paper px-4 py-3 text-sm">
+          <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--accent)]" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+          <span>
+            저는 <b>{grade}학년 {classNo}반</b> 학생이 맞아요.
+          </span>
+        </label>
+        <button disabled={!agree || busy} onClick={start} className="mt-4 w-full rounded-xl bg-accent py-3 font-bold text-white disabled:opacity-40">
+          {busy ? '만드는 중…' : '우리 반 시작하고 코드 받기'}
+        </button>
+        {error && <p className="mt-3 text-sm text-accent">{error}</p>}
+        <p className="mt-4 text-xs leading-relaxed text-muted">다른 반을 장난으로 시작하면 선생님이 확인해 되돌릴 수 있어요.</p>
+      </div>
+    </main>
+  );
+}
+
+function CodeReveal({ grade, classNo, code, onDone }: { grade: number; classNo: number; code: string; onDone: () => void }) {
+  const [saved, setSaved] = useState(false);
+  return (
+    <main className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
+      <div className="rounded-2xl border-2 border-accent bg-card p-6 text-center shadow-sm">
+        <p className="text-sm font-semibold text-accent">📸 지금 이 화면을 캡처해 두세요!</p>
+        <h1 className="mt-2 text-xl font-bold">
+          {grade}학년 {classNo}반 우리 반 코드
+        </h1>
+        <p className="mt-4 rounded-xl bg-accent-soft py-5 font-mono text-4xl font-bold tracking-[0.3em] text-accent">{code}</p>
+        <p className="mt-2 text-xs text-muted">2026학년도 백영고 교지 학급 프로필</p>
+        <ul className="mt-5 space-y-1.5 text-left text-sm leading-relaxed text-muted">
+          <li>• 다음에 다시 들어오거나 <b className="text-ink">다른 기기</b>에서 쓸 때 이 코드를 입력해요.</li>
+          <li>• 같은 반 친구와 함께 쓰려면 이 코드를 알려 주세요.</li>
+          <li>• <b className="text-ink">다른 반에는 알려 주지 마세요.</b> 작성 화면의 &quot;🔑 우리 반 코드 보기&quot;로 언제든 다시 볼 수 있어요.</li>
+        </ul>
+        <label className="mt-5 flex items-start gap-2 rounded-xl bg-paper px-4 py-3 text-left text-sm">
+          <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--accent)]" checked={saved} onChange={(e) => setSaved(e.target.checked)} />
+          <span>코드를 캡처했어요 (또는 적어 두었어요)</span>
+        </label>
+        <button disabled={!saved} onClick={onDone} className="mt-4 w-full rounded-xl bg-accent py-3 font-bold text-white disabled:opacity-40">
+          작성 시작하기
+        </button>
+      </div>
+    </main>
+  );
+}
+
 function CodeGate({ grade, classNo, onPass }: { grade: number; classNo: number; onPass: () => void }) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -341,7 +479,7 @@ function CodeGate({ grade, classNo, onPass }: { grade: number; classNo: number; 
           {grade}학년 {classNo}반
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          교지 편집부 선생님께 받은 <b className="text-ink">우리 반 코드</b>를 입력해 주세요. 한 번 입력하면 이 기기에서는 다시 묻지 않아요.
+          이 반은 이미 시작됐어요. 처음 시작할 때 받은 <b className="text-ink">우리 반 코드</b>를 입력해 주세요. 한 번 입력하면 이 기기에서는 다시 묻지 않아요.
         </p>
         <form onSubmit={submit} className="mt-5 space-y-3">
           <input
@@ -361,7 +499,8 @@ function CodeGate({ grade, classNo, onPass }: { grade: number; classNo: number; 
         </form>
         <div className="mt-5 rounded-xl bg-paper px-4 py-3 text-xs leading-relaxed text-muted">
           <p className="font-bold text-ink">코드를 모르면?</p>
-          <p className="mt-1">반 코드는 교지 편집부 선생님이 반마다 나눠 줘요. 받지 못했거나 잃어버렸다면 교지 편집부 선생님께 물어보세요.</p>
+          <p className="mt-1">처음 시작한 친구(회장)의 휴대폰 캡처 사진이나, 그 친구 화면의 &quot;🔑 우리 반 코드 보기&quot;에서 확인할 수 있어요.</p>
+          <p className="mt-1">코드를 잃어버렸거나, 우리 반이 아닌 사람이 먼저 시작한 것 같다면 교지 편집부 선생님께 말씀드리세요. 선생님이 다시 시작할 수 있게 해 주세요.</p>
           <p className="mt-1">코드가 맞는데도 안 되면, 학년·반을 잘못 고르지 않았는지 확인해 주세요.</p>
         </div>
       </div>

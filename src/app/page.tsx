@@ -57,20 +57,20 @@ export default function Home() {
       )}
 
       <section className="mt-6 rounded-2xl border-2 border-accent/40 bg-accent-soft p-5">
-        <h2 className="text-lg font-bold text-accent">🔑 작성하려면 &lsquo;우리 반 코드&rsquo;가 필요해요</h2>
+        <h2 className="text-lg font-bold text-accent">🔑 처음 들어가면 &lsquo;우리 반 코드&rsquo;가 만들어져요</h2>
         <ol className="mt-3 space-y-1.5 text-sm leading-relaxed text-ink">
           <li>
-            <b>1.</b> 교지 편집부 선생님께 받은 <b>6자리 반 코드</b>를 준비해요. (예: <span className="font-mono font-bold">K7M3QX</span>)
+            <b>1.</b> 아래에서 학년을 고르고 <b>우리 반</b>을 눌러요.
           </li>
           <li>
-            <b>2.</b> 아래에서 학년을 고르고 <b>우리 반</b>을 눌러요.
+            <b>2.</b> 처음 시작하는 반이면 <b>6자리 우리 반 코드</b>가 나와요. <b>꼭 캡처</b>해 두세요!
           </li>
           <li>
-            <b>3.</b> 코드를 입력하면 우리 반 인터뷰지가 열려요. 한 번 입력하면 그 기기에서는 다시 묻지 않아요.
+            <b>3.</b> 다음에 다시 들어오거나 다른 기기에서 쓸 때, 같은 반 친구와 함께 쓸 때 그 코드를 입력해요.
           </li>
         </ol>
         <p className="mt-3 text-xs text-muted">
-          코드는 우리 반 내용을 지키는 열쇠예요. 다른 반 친구에게 알려 주지 마세요. 코드를 잃어버렸다면 교지 편집부 선생님께 다시 물어보세요.
+          코드는 우리 반 내용을 지키는 열쇠예요. 다른 반에는 알려 주지 마세요. 코드를 잃어버렸다면 교지 편집부 선생님께 물어보세요.
         </p>
       </section>
 
