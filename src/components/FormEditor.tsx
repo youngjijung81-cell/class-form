@@ -412,7 +412,10 @@ function PhotoSlot({
   const onFile = async (file: File | undefined) => {
     if (!file) return;
     setError('');
-    if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) {
+    // 일부 안드로이드 폰은 파일 종류를 비워서 보내므로 확장자로도 판단한다.
+    const extType: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif' };
+    const type = file.type || extType[file.name.split('.').pop()?.toLowerCase() ?? ''] || '';
+    if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(type)) {
       setError('JPG, PNG, WEBP, HEIC 사진만 올릴 수 있어요.');
       return;
     }
@@ -420,13 +423,14 @@ function PhotoSlot({
       setError('사진이 30MB보다 커요.');
       return;
     }
-    const ext = file.type === 'image/jpeg' ? 'jpg' : file.type.split('/')[1];
+    const ext = type === 'image/jpeg' ? 'jpg' : type.split('/')[1];
     setProgress(0);
     try {
       const blob = await upload(`photos/${grade}-${classNo}/${kind}/photo.${ext}`, file, {
         access: 'private',
         handleUploadUrl: '/api/upload',
         clientPayload: JSON.stringify({ grade, classNo, kind }),
+        contentType: type,
         multipart: file.size > 8 * 1024 * 1024,
         onUploadProgress: (p) => setProgress(Math.round(p.percentage)),
       });
@@ -476,7 +480,7 @@ function PhotoSlot({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+        accept="image/*"
         className="hidden"
         onChange={(e) => onFile(e.target.files?.[0])}
       />

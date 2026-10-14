@@ -326,7 +326,17 @@ function Detail({
                 {p ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={photoUrl(kind)} alt={`${grade}학년 ${classNo}반 ${PHOTO_KINDS[kind]}`} className="mt-2 max-h-64 w-full rounded-lg bg-paper object-contain" />
+                    <img
+                      src={photoUrl(kind)}
+                      alt={`${grade}학년 ${classNo}반 ${PHOTO_KINDS[kind]}`}
+                      className="mt-2 max-h-64 w-full rounded-lg bg-paper object-contain"
+                      onError={(e) => {
+                        // 아이폰 HEIC 사진은 대부분의 PC 브라우저가 미리 보여 주지 못한다.
+                        const el = e.currentTarget;
+                        el.style.display = 'none';
+                        el.insertAdjacentHTML('afterend', '<p class="mt-2 rounded-lg bg-paper px-3 py-6 text-center text-sm text-muted">이 브라우저에서 미리보기가 안 되는 형식이에요(아이폰 HEIC 등). 원본 받기로 확인해 주세요.</p>');
+                      }}
+                    />
                     <p className="mt-1 break-all text-xs text-muted">{p.name}</p>
                     <a href={photoUrl(kind, true)} className="mt-2 inline-block rounded-lg bg-ink px-3 py-1.5 text-sm text-white">
                       원본 받기
