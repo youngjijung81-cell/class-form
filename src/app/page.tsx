@@ -100,7 +100,7 @@ export default function Home() {
       </section>
 
       <p className="mt-6 text-center text-sm text-muted">
-        반장(회장)이 반 친구들과 함께 작성해 주세요. 저장한 뒤에도 언제든 다시 들어와 고칠 수 있어요.
+        우리 반을 누르고 교지 편집부 선생님께 받은 반 코드를 입력하면 작성할 수 있어요. 저장한 뒤에도 언제든 다시 들어와 고칠 수 있어요.
       </p>
       <p className="mt-10 text-center text-xs text-muted">
         <span className="sr-only">{FORM_TITLE}</span>

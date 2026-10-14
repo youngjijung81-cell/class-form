@@ -46,6 +46,7 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
   const [conflict, setConflict] = useState<Resp | null>(null);
   const [draft, setDraft] = useState<Text | null>(null);
+  const [needCode, setNeedCode] = useState(false);
 
   const dirty = !sameText(text, saved);
 
@@ -57,11 +58,18 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
     setPhotos({ official: r.photo_official, free: r.photo_free });
   }, []);
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
+    setLoading(true);
+    setLoadError('');
     fetch(`/api/responses/${grade}/${classNo}`, { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.error) throw new Error(d.error);
+      .then(async (r) => {
+        const d = await r.json();
+        if (r.status === 401 && d.needCode) {
+          setNeedCode(true);
+          return;
+        }
+        if (!r.ok || d.error) throw new Error(d.error);
+        setNeedCode(false);
         setClosed(!!d.closed);
         applyServer(d.response);
         try {
@@ -78,14 +86,18 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
       .finally(() => setLoading(false));
   }, [grade, classNo, draftKey, applyServer]);
 
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
   // 저장 전 내용은 이 기기에 임시로 보관해, 창이 닫혀도 잃지 않게 한다.
   useEffect(() => {
-    if (loading) return;
+    if (loading || needCode) return;
     try {
       if (dirty) localStorage.setItem(draftKey, JSON.stringify(text));
       else localStorage.removeItem(draftKey);
     } catch {}
-  }, [text, dirty, loading, draftKey]);
+  }, [text, dirty, loading, needCode, draftKey]);
 
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
@@ -109,6 +121,11 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
         setConflict(d.latest);
         return;
       }
+      if (res.status === 401 && d.needCode) {
+        // 쓰던 내용은 이 기기 임시 저장에 남아 있으므로, 코드를 다시 넣으면 불러올 수 있다.
+        setNeedCode(true);
+        return;
+      }
       if (!res.ok) throw new Error(d.error || '저장하지 못했어요.');
       const t = { homeroom: d.response.homeroom, writer: d.response.writer, answers: d.response.answers };
       setSaved(t);
@@ -125,6 +142,10 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
 
   const setAnswer = (i: number, v: string) =>
     setText((t) => ({ ...t, answers: t.answers.map((a, j) => (j === i ? v : a)) }));
+
+  if (needCode) {
+    return <CodeGate grade={grade} classNo={classNo} onPass={loadData} />;
+  }
 
   if (loading) {
     return <main className="mx-auto w-full max-w-3xl px-4 py-16 text-center text-muted">불러오는 중…</main>;
@@ -279,6 +300,66 @@ export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; class
           )}
         </div>
       )}
+    </main>
+  );
+}
+
+function CodeGate({ grade, classNo, onPass }: { grade: number; classNo: number; onPass: () => void }) {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim()) return setError('반 코드를 입력해 주세요.');
+    setBusy(true);
+    setError('');
+    try {
+      const res = await fetch('/api/class-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade, classNo, code }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || '확인하지 못했어요.');
+      onPass();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <main className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
+      <Link href="/" className="text-sm text-muted hover:text-ink">
+        ← 반 고르기로 돌아가기
+      </Link>
+      <div className="mt-6 rounded-2xl border border-line bg-card p-6 shadow-sm">
+        <p className="text-sm font-semibold text-accent">2026학년도 백영고 교지</p>
+        <h1 className="mt-1 text-2xl font-bold">
+          {grade}학년 {classNo}반
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted">
+          교지 편집부 선생님께 받은 <b className="text-ink">우리 반 코드</b>를 입력해 주세요. 한 번 입력하면 이 기기에서는 다시 묻지 않아요.
+        </p>
+        <form onSubmit={submit} className="mt-5 space-y-3">
+          <input
+            className="w-full rounded-xl border border-line bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.3em] uppercase outline-none focus:border-ink"
+            placeholder="ABC123"
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            maxLength={12}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <button disabled={busy} className="w-full rounded-xl bg-accent py-3 font-bold text-white disabled:opacity-50">
+            {busy ? '확인 중…' : '들어가기'}
+          </button>
+          {error && <p className="text-sm text-accent">{error}</p>}
+        </form>
+      </div>
     </main>
   );
 }

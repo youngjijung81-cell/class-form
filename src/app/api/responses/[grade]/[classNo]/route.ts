@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { parseGradeClass } from '@/lib/questions';
 import { withReadRetry } from '@/lib/server/db';
+import { canAccessClass } from '@/lib/server/classAuth';
 import { getRow, getRowWithClosed, isClosed, saveText, toPublic, validateText } from '@/lib/server/responses';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   const p = parseGradeClass((await params).grade, (await params).classNo);
   if (!p) return NextResponse.json({ error: '학년·반이 올바르지 않습니다.' }, { status: 400 });
   try {
+    if (!(await withReadRetry(() => canAccessClass(p.grade, p.classNo)))) return NextResponse.json({ error: '반 코드를 입력해 주세요.', needCode: true }, { status: 401 });
     const { row, closed } = await withReadRetry(() => getRowWithClosed(p.grade, p.classNo));
     return NextResponse.json({ closed, response: toPublic(row) });
   } catch (err) {
@@ -34,6 +36,7 @@ export async function PUT(req: Request, { params }: Ctx) {
   if (typeof input === 'string') return NextResponse.json({ error: input }, { status: 400 });
 
   try {
+    if (!(await canAccessClass(p.grade, p.classNo))) return NextResponse.json({ error: '반 코드를 입력해 주세요.', needCode: true }, { status: 401 });
     if (await isClosed()) return NextResponse.json({ error: '제출이 마감되었습니다.' }, { status: 403 });
     const expected = typeof body.updatedAt === 'string' ? body.updatedAt : null;
     const saved = await saveText(p.grade, p.classNo, input, expected, body.force === true);

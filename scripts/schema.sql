@@ -25,3 +25,12 @@ create table if not exists settings (
   value text not null
 );
 insert into settings (key, value) values ('closed', 'false') on conflict do nothing;
+
+-- 반별 입장 코드. 회장은 자기 반 코드로만 그 반을 보고 고칠 수 있다.
+create table if not exists class_codes (
+  grade smallint not null check (grade between 1 and 3),
+  class_no smallint not null check (class_no between 1 and 12),
+  code text not null unique,
+  created_at timestamptz not null default now(),
+  primary key (grade, class_no)
+);

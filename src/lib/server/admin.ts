@@ -10,11 +10,11 @@ function secret() {
   return s;
 }
 
-function sign(value: string) {
+export function sign(value: string) {
   return createHmac('sha256', secret()).update(value).digest('base64url');
 }
 
-function safeEqual(a: string, b: string) {
+export function safeEqual(a: string, b: string) {
   const ab = Buffer.from(a);
   const bb = Buffer.from(b);
   return ab.length === bb.length && timingSafeEqual(ab, bb);

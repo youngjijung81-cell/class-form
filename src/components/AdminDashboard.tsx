@@ -36,6 +36,8 @@ export default function AdminDashboard() {
   const [closed, setClosed] = useState(false);
   const [grade, setGrade] = useState<1 | 2 | 3>(1);
   const [open, setOpen] = useState<{ grade: 1 | 2 | 3; classNo: number } | null>(null);
+  const [codes, setCodes] = useState<Map<string, string>>(new Map());
+  const [showSheet, setShowSheet] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetch('/api/admin/responses', { cache: 'no-store' });
@@ -44,7 +46,21 @@ export default function AdminDashboard() {
     setAuthed(true);
     setClosed(!!d.closed);
     setRows(new Map((d.responses as Row[]).map((r) => [`${r.grade}-${r.class_no}`, r])));
+    const c = await fetch('/api/admin/codes', { cache: 'no-store' }).then((r) => r.json());
+    setCodes(new Map(((c.codes ?? []) as { grade: number; class_no: number; code: string }[]).map((x) => [`${x.grade}-${x.class_no}`, x.code])));
   }, []);
+
+  const reissue = async (g: number, c: number) => {
+    if (!confirm(`${g}학년 ${c}반 코드를 새로 바꿀까요?\n예전 코드는 더 이상 쓸 수 없고, 이미 들어와 있던 기기도 새 코드를 다시 입력해야 해요.`)) return;
+    const res = await fetch('/api/admin/codes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grade: g, classNo: c }),
+    });
+    const d = await res.json();
+    if (res.ok) setCodes((m) => new Map(m).set(`${g}-${c}`, d.code));
+    else alert(d.error || '바꾸지 못했어요.');
+  };
 
   useEffect(() => {
     load().catch(() => setAuthed(false));
@@ -105,6 +121,9 @@ export default function AdminDashboard() {
     );
   }
 
+  // 인쇄할 때 관리 화면이 섞이지 않도록 코드표만 단독으로 보여 준다.
+  if (showSheet) return <CodeSheet codes={codes} onClose={() => setShowSheet(false)} />;
+
   const all = [...rows.values()];
   const total = GRADES.length * CLASS_COUNT;
   const doneCount = all.filter((r) => r.answers.every((a) => a.trim()) && r.photo_official && r.photo_free).length;
@@ -116,6 +135,9 @@ export default function AdminDashboard() {
         <a href="/api/admin/export" className="rounded-lg bg-ink px-4 py-2 text-sm font-bold text-white">
           전체 답변 엑셀(CSV) 받기
         </a>
+        <button onClick={() => setShowSheet(true)} className="rounded-lg border border-ink px-4 py-2 text-sm font-bold">
+          반 코드표 보기·인쇄
+        </button>
         <button onClick={toggleClosed} className={`rounded-lg px-4 py-2 text-sm font-bold ${closed ? 'bg-ok text-white' : 'border border-accent text-accent'}`}>
           {closed ? '마감 풀기' : '제출 마감하기'}
         </button>
@@ -136,10 +158,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className="mt-4 overflow-x-auto rounded-xl border border-line bg-card">
-        <table className="w-full min-w-[640px] text-sm">
+        <table className="w-full min-w-[760px] text-sm">
           <thead className="bg-paper text-left text-muted">
             <tr>
               <th className="px-3 py-2">반</th>
+              <th className="px-3 py-2">반 코드</th>
               <th className="px-3 py-2">담임</th>
               <th className="px-3 py-2">작성자</th>
               <th className="px-3 py-2">답변</th>
@@ -156,6 +179,12 @@ export default function AdminDashboard() {
               return (
                 <tr key={c} className="border-t border-line">
                   <td className="px-3 py-2 font-bold">{c}반</td>
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <span className="font-mono font-bold tracking-wider">{codes.get(`${grade}-${c}`) ?? '-'}</span>
+                    <button onClick={() => reissue(grade, c)} className="ml-2 text-xs text-muted underline underline-offset-2">
+                      새 코드
+                    </button>
+                  </td>
                   <td className="px-3 py-2">{r?.homeroom || '-'}</td>
                   <td className="px-3 py-2">{r?.writer || '-'}</td>
                   <td className={`px-3 py-2 ${answered === 6 ? 'text-ok font-bold' : ''}`}>{answered}/6</td>
@@ -183,6 +212,42 @@ export default function AdminDashboard() {
         />
       )}
     </main>
+  );
+}
+
+function CodeSheet({ codes, onClose }: { codes: Map<string, string>; onClose: () => void }) {
+  const site = typeof window !== 'undefined' ? window.location.origin : '';
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-4xl px-4 py-6">
+        <div className="flex items-center gap-2 print:hidden">
+          <h2 className="flex-1 text-xl font-bold">반 코드표</h2>
+          <button onClick={() => window.print()} className="rounded-lg bg-ink px-4 py-2 text-sm font-bold text-white">
+            인쇄
+          </button>
+          <button onClick={onClose} className="rounded-lg border border-line px-4 py-2 text-sm">
+            닫기
+          </button>
+        </div>
+        <p className="mt-2 text-sm text-muted print:hidden">점선을 따라 잘라 각 반 회장에게 나눠 주세요. 다른 반에 코드가 알려지면 관리 화면에서 &quot;새 코드&quot;로 바꾸면 돼요.</p>
+        {GRADES.map((g) => (
+          <section key={g} className="mt-6 break-inside-avoid">
+            <h3 className="font-bold">{g}학년</h3>
+            <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 print:grid-cols-3">
+              {Array.from({ length: CLASS_COUNT }, (_, i) => i + 1).map((c) => (
+                <div key={c} className="rounded-lg border border-dashed border-gray-400 p-3 break-inside-avoid">
+                  <p className="text-sm font-bold">
+                    {g}학년 {c}반 교지 학급 프로필
+                  </p>
+                  <p className="mt-1 font-mono text-2xl font-bold tracking-[0.25em]">{codes.get(`${g}-${c}`) ?? '-'}</p>
+                  <p className="mt-1 break-all text-xs text-gray-600">{site.replace(/^https?:\/\//, '')}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
   );
 }
 

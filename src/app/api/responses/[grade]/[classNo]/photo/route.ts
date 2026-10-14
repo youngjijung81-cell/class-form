@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { head } from '@vercel/blob';
 import { PHOTO_KINDS, parseGradeClass, type PhotoKind } from '@/lib/questions';
 import { isClosed, photoPrefix, savePhoto, toPublic } from '@/lib/server/responses';
+import { canAccessClass } from '@/lib/server/classAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,7 @@ export async function POST(req: Request, { params }: Ctx) {
   }
 
   try {
+    if (!(await canAccessClass(p.grade, p.classNo))) return NextResponse.json({ error: '반 코드를 입력해 주세요.', needCode: true }, { status: 401 });
     if (await isClosed()) return NextResponse.json({ error: '제출이 마감되었습니다.' }, { status: 403 });
     // 실제로 저장소에 올라간 파일인지 확인한다.
     const meta = await head(pathname).catch(() => null);

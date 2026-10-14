@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { PHOTO_KINDS, parseGradeClass, type PhotoKind } from '@/lib/questions';
 import { isClosed, photoPrefix } from '@/lib/server/responses';
+import { canAccessClass } from '@/lib/server/classAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
         const kind = payload?.kind as PhotoKind;
         if (!p || !(kind in PHOTO_KINDS)) throw new Error('bad target');
         if (!pathname.startsWith(photoPrefix(p.grade, p.classNo, kind)) || pathname.includes('..')) throw new Error('bad path');
+        if (!(await canAccessClass(p.grade, p.classNo))) throw new Error('no access');
         if (await isClosed()) throw new Error('closed');
         return {
           allowedContentTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'],
