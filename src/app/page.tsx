@@ -56,7 +56,25 @@ export default function Home() {
         </div>
       )}
 
-      <section className="mt-8 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6">
+      <section className="mt-6 rounded-2xl border-2 border-accent/40 bg-accent-soft p-5">
+        <h2 className="text-lg font-bold text-accent">🔑 작성하려면 &lsquo;우리 반 코드&rsquo;가 필요해요</h2>
+        <ol className="mt-3 space-y-1.5 text-sm leading-relaxed text-ink">
+          <li>
+            <b>1.</b> 교지 편집부 선생님께 받은 <b>6자리 반 코드</b>를 준비해요. (예: <span className="font-mono font-bold">K7M3QX</span>)
+          </li>
+          <li>
+            <b>2.</b> 아래에서 학년을 고르고 <b>우리 반</b>을 눌러요.
+          </li>
+          <li>
+            <b>3.</b> 코드를 입력하면 우리 반 인터뷰지가 열려요. 한 번 입력하면 그 기기에서는 다시 묻지 않아요.
+          </li>
+        </ol>
+        <p className="mt-3 text-xs text-muted">
+          코드는 우리 반 내용을 지키는 열쇠예요. 다른 반 친구에게 알려 주지 마세요. 코드를 잃어버렸다면 교지 편집부 선생님께 다시 물어보세요.
+        </p>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-line bg-card p-5 shadow-sm sm:p-6">
         <h2 className="text-lg font-bold">우리 반 고르기</h2>
         <div className="mt-4 grid grid-cols-3 gap-2" role="tablist" aria-label="학년">
           {GRADES.map((g) => (
@@ -100,7 +118,7 @@ export default function Home() {
       </section>
 
       <p className="mt-6 text-center text-sm text-muted">
-        우리 반을 누르고 교지 편집부 선생님께 받은 반 코드를 입력하면 작성할 수 있어요. 저장한 뒤에도 언제든 다시 들어와 고칠 수 있어요.
+        저장한 뒤에도 마감 전까지 언제든 다시 들어와 고칠 수 있어요.
       </p>
       <p className="mt-10 text-center text-xs text-muted">
         <span className="sr-only">{FORM_TITLE}</span>

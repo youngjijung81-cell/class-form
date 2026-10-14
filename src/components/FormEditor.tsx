@@ -359,6 +359,11 @@ function CodeGate({ grade, classNo, onPass }: { grade: number; classNo: number; 
           </button>
           {error && <p className="text-sm text-accent">{error}</p>}
         </form>
+        <div className="mt-5 rounded-xl bg-paper px-4 py-3 text-xs leading-relaxed text-muted">
+          <p className="font-bold text-ink">코드를 모르면?</p>
+          <p className="mt-1">반 코드는 교지 편집부 선생님이 반마다 나눠 줘요. 받지 못했거나 잃어버렸다면 교지 편집부 선생님께 물어보세요.</p>
+          <p className="mt-1">코드가 맞는데도 안 되면, 학년·반을 잘못 고르지 않았는지 확인해 주세요.</p>
+        </div>
       </div>
     </main>
   );
