@@ -53,16 +53,12 @@ export async function getRow(grade: number, classNo: number): Promise<ResponseRo
   return (rows[0] as ResponseRow) ?? emptyRow(grade, classNo);
 }
 
-// 저장 직전 상태를 기록해 두어 덮어쓰기·장난을 관리자가 되돌릴 수 있게 한다.
-async function snapshot(grade: number, classNo: number, reason: string) {
-  const sql = getSql();
-  await sql`
-    insert into response_history (grade, class_no, reason, snapshot)
-    select grade, class_no, ${reason}, to_jsonb(r) - 'grade' - 'class_no'
-    from responses r where grade = ${grade} and class_no = ${classNo}`;
-}
+const RETURNING = 'grade, class_no, homeroom, writer, answers, photo_official, photo_free, updated_at';
 
-/** expectedUpdatedAt이 현재 값과 다르면(다른 사람이 먼저 저장) null을 돌려준다. */
+/**
+ * 충돌 확인·이전 상태 기록·저장을 한 SQL 문으로 처리해, 여러 명이 동시에 저장해도 끼어들 틈이 없게 한다.
+ * expectedUpdatedAt이 현재 값과 다르면(다른 사람이 먼저 저장) null을 돌려준다.
+ */
 export async function saveText(
   grade: number,
   classNo: number,
@@ -71,36 +67,49 @@ export async function saveText(
   force: boolean
 ): Promise<ResponseRow | null> {
   const sql = getSql();
-  const current = await getRow(grade, classNo);
-  if (!force && (current.updated_at ? new Date(current.updated_at).toISOString() : null) !== expectedUpdatedAt) {
-    return null;
-  }
-  await snapshot(grade, classNo, 'text');
-  const rows = await sql`
-    insert into responses (grade, class_no, homeroom, writer, answers, updated_at)
-    values (${grade}, ${classNo}, ${input.homeroom}, ${input.writer}, ${JSON.stringify(input.answers)}::jsonb, now())
-    on conflict (grade, class_no) do update
-      set homeroom = excluded.homeroom, writer = excluded.writer, answers = excluded.answers, updated_at = now()
-    returning grade, class_no, homeroom, writer, answers, photo_official, photo_free, updated_at`;
-  return rows[0] as ResponseRow;
+  const rows = await sql.query(
+    `with prev as (
+       select * from responses where grade = $1 and class_no = $2
+     ),
+     up as (
+       insert into responses as r (grade, class_no, homeroom, writer, answers, updated_at)
+       values ($1, $2, $3, $4, $5::jsonb, clock_timestamp())
+       on conflict (grade, class_no) do update
+         set homeroom = excluded.homeroom, writer = excluded.writer, answers = excluded.answers, updated_at = clock_timestamp()
+         where $6::boolean or date_trunc('milliseconds', r.updated_at) is not distinct from $7::timestamptz
+       returning ${RETURNING}
+     ),
+     hist as (
+       insert into response_history (grade, class_no, reason, snapshot)
+       select p.grade, p.class_no, 'text', to_jsonb(p) - 'grade' - 'class_no'
+       from prev p where exists (select 1 from up)
+     )
+     select * from up`,
+    [grade, classNo, input.homeroom, input.writer, JSON.stringify(input.answers), force, expectedUpdatedAt]
+  );
+  return (rows[0] as ResponseRow) ?? null;
 }
 
 export async function savePhoto(grade: number, classNo: number, kind: PhotoKind, info: PhotoInfo): Promise<ResponseRow> {
   const sql = getSql();
-  await snapshot(grade, classNo, `photo_${kind}`);
-  const json = JSON.stringify(info);
-  const rows =
-    kind === 'official'
-      ? await sql`
-          insert into responses (grade, class_no, photo_official, updated_at)
-          values (${grade}, ${classNo}, ${json}::jsonb, now())
-          on conflict (grade, class_no) do update set photo_official = excluded.photo_official, updated_at = now()
-          returning grade, class_no, homeroom, writer, answers, photo_official, photo_free, updated_at`
-      : await sql`
-          insert into responses (grade, class_no, photo_free, updated_at)
-          values (${grade}, ${classNo}, ${json}::jsonb, now())
-          on conflict (grade, class_no) do update set photo_free = excluded.photo_free, updated_at = now()
-          returning grade, class_no, homeroom, writer, answers, photo_official, photo_free, updated_at`;
+  const col = kind === 'official' ? 'photo_official' : 'photo_free';
+  const rows = await sql.query(
+    `with prev as (
+       select * from responses where grade = $1 and class_no = $2
+     ),
+     up as (
+       insert into responses (grade, class_no, ${col}, updated_at)
+       values ($1, $2, $3::jsonb, clock_timestamp())
+       on conflict (grade, class_no) do update set ${col} = excluded.${col}, updated_at = clock_timestamp()
+       returning ${RETURNING}
+     ),
+     hist as (
+       insert into response_history (grade, class_no, reason, snapshot)
+       select p.grade, p.class_no, $4, to_jsonb(p) - 'grade' - 'class_no' from prev p
+     )
+     select * from up`,
+    [grade, classNo, JSON.stringify(info), `photo_${kind}`]
+  );
   return rows[0] as ResponseRow;
 }
 
