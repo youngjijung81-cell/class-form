@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f6f1e7;
+  --card: #fffdf8;
+  --ink: #2b2620;
+  --muted: #6f665a;
+  --line: #e2d8c6;
+  --accent: #c2410c;
+  --accent-soft: #fde7d9;
+  --ok: #15803d;
+  --ok-soft: #dcfce7;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  word-break: keep-all;
+}
+
+textarea, input { font: inherit; }

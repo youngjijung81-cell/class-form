@@ -1,0 +1,400 @@
+'use client';
+
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { upload } from '@vercel/blob/client';
+import { ANSWER_MAX, FORMS, NAME_MAX, PHOTO_GUIDE, PHOTO_KINDS, type PhotoKind } from '@/lib/questions';
+
+type PhotoMeta = { name: string; size: number; uploadedAt: string } | null;
+type Resp = {
+  homeroom: string;
+  writer: string;
+  answers: string[];
+  photo_official: PhotoMeta;
+  photo_free: PhotoMeta;
+  updated_at: string | null;
+};
+type Text = { homeroom: string; writer: string; answers: string[] };
+
+const EMPTY: Text = { homeroom: '', writer: '', answers: ['', '', '', '', '', ''] };
+
+function sameText(a: Text, b: Text) {
+  return a.homeroom === b.homeroom && a.writer === b.writer && a.answers.every((v, i) => v === b.answers[i]);
+}
+
+function fmtTime(iso: string | null) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtSize(n: number) {
+  return n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1024))}KB`;
+}
+
+export default function FormEditor({ grade, classNo }: { grade: 1 | 2 | 3; classNo: number }) {
+  const form = FORMS[grade];
+  const draftKey = `cf_draft_${grade}_${classNo}`;
+
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [closed, setClosed] = useState(false);
+  const [text, setText] = useState<Text>(EMPTY);
+  const [saved, setSaved] = useState<Text>(EMPTY);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<Record<PhotoKind, PhotoMeta>>({ official: null, free: null });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  const [conflict, setConflict] = useState<Resp | null>(null);
+  const [draft, setDraft] = useState<Text | null>(null);
+
+  const dirty = !sameText(text, saved);
+
+  const applyServer = useCallback((r: Resp) => {
+    const t = { homeroom: r.homeroom, writer: r.writer, answers: r.answers };
+    setText(t);
+    setSaved(t);
+    setUpdatedAt(r.updated_at);
+    setPhotos({ official: r.photo_official, free: r.photo_free });
+  }, []);
+
+  useEffect(() => {
+    fetch(`/api/responses/${grade}/${classNo}`, { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.error) throw new Error(d.error);
+        setClosed(!!d.closed);
+        applyServer(d.response);
+        try {
+          const raw = localStorage.getItem(draftKey);
+          if (raw) {
+            const local = JSON.parse(raw) as Text;
+            const server = { homeroom: d.response.homeroom, writer: d.response.writer, answers: d.response.answers };
+            if (!sameText(local, server)) setDraft(local);
+            else localStorage.removeItem(draftKey);
+          }
+        } catch {}
+      })
+      .catch(() => setLoadError('내용을 불러오지 못했어요. 새로고침해 주세요.'))
+      .finally(() => setLoading(false));
+  }, [grade, classNo, draftKey, applyServer]);
+
+  // 저장 전 내용은 이 기기에 임시로 보관해, 창이 닫혀도 잃지 않게 한다.
+  useEffect(() => {
+    if (loading) return;
+    try {
+      if (dirty) localStorage.setItem(draftKey, JSON.stringify(text));
+      else localStorage.removeItem(draftKey);
+    } catch {}
+  }, [text, dirty, loading, draftKey]);
+
+  useEffect(() => {
+    const warn = (e: BeforeUnloadEvent) => {
+      if (dirty) e.preventDefault();
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
+
+  const save = async (force = false) => {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/responses/${grade}/${classNo}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...text, updatedAt, force }),
+      });
+      const d = await res.json();
+      if (res.status === 409) {
+        setConflict(d.latest);
+        return;
+      }
+      if (!res.ok) throw new Error(d.error || '저장하지 못했어요.');
+      const t = { homeroom: d.response.homeroom, writer: d.response.writer, answers: d.response.answers };
+      setSaved(t);
+      setText(t);
+      setUpdatedAt(d.response.updated_at);
+      setConflict(null);
+      setMessage({ kind: 'ok', text: '저장했어요! 언제든 다시 들어와 고칠 수 있어요.' });
+    } catch (e: any) {
+      setMessage({ kind: 'error', text: e.message || '저장하지 못했어요.' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const setAnswer = (i: number, v: string) =>
+    setText((t) => ({ ...t, answers: t.answers.map((a, j) => (j === i ? v : a)) }));
+
+  if (loading) {
+    return <main className="mx-auto w-full max-w-3xl px-4 py-16 text-center text-muted">불러오는 중…</main>;
+  }
+
+  const answeredCount = text.answers.filter((a) => a.trim()).length;
+
+  return (
+    <main className="mx-auto w-full max-w-3xl px-4 pb-32 pt-6 sm:pt-10">
+      <Link href="/" className="text-sm text-muted hover:text-ink">
+        ← 반 고르기로 돌아가기
+      </Link>
+      <p className="mt-4 text-sm font-semibold text-accent">[{grade}학년] 2026학년도 백영고 교지</p>
+      <h1 className="mt-1 text-2xl font-bold leading-snug sm:text-3xl">
+        {grade}학년 {classNo}반 · {form.title.replace('학급 비밀 보고서: ', '')}
+      </h1>
+      <p className="mt-2 text-sm text-muted">
+        {updatedAt ? `마지막 저장: ${fmtTime(updatedAt)}` : '아직 저장된 내용이 없어요.'}
+      </p>
+
+      {loadError && <Banner tone="error">{loadError}</Banner>}
+      {closed && <Banner tone="error">제출이 마감되었어요. 내용을 볼 수만 있어요.</Banner>}
+
+      {draft && !closed && (
+        <Banner tone="info">
+          이 기기에 저장하지 않은 내용이 남아 있어요.
+          <span className="mt-2 flex gap-2">
+            <button className="rounded-lg bg-ink px-3 py-1.5 text-sm text-white" onClick={() => { setText(draft); setDraft(null); }}>
+              그 내용 불러오기
+            </button>
+            <button className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm" onClick={() => { setDraft(null); try { localStorage.removeItem(draftKey); } catch {} }}>
+              버리기
+            </button>
+          </span>
+        </Banner>
+      )}
+
+      <section className="mt-6 rounded-2xl border border-line bg-card p-5 shadow-sm">
+        <h2 className="font-bold">기본 정보</h2>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <Field label="소속 학급">
+            <div className="rounded-lg border border-line bg-paper px-3 py-2.5 text-muted">{grade}학년 {classNo}반</div>
+          </Field>
+          <Field label="담임선생님">
+            <input
+              className="w-full rounded-lg border border-line bg-white px-3 py-2.5 outline-none focus:border-ink disabled:bg-paper"
+              placeholder="성함"
+              maxLength={NAME_MAX}
+              value={text.homeroom}
+              disabled={closed}
+              onChange={(e) => setText({ ...text, homeroom: e.target.value })}
+            />
+          </Field>
+          <Field label="작성자(반장)">
+            <input
+              className="w-full rounded-lg border border-line bg-white px-3 py-2.5 outline-none focus:border-ink disabled:bg-paper"
+              placeholder="이름"
+              maxLength={NAME_MAX}
+              value={text.writer}
+              disabled={closed}
+              onChange={(e) => setText({ ...text, writer: e.target.value })}
+            />
+          </Field>
+        </div>
+      </section>
+
+      {form.questions.map((q, i) => (
+        <section key={i} className="mt-4 rounded-2xl border border-line bg-card p-5 shadow-sm">
+          <p className="text-sm font-bold text-accent">
+            Q{i + 1}. [{q.tag}]
+          </p>
+          <h3 className="mt-1 text-lg font-bold leading-snug">{q.prompt}</h3>
+          <ul className="mt-2 space-y-1 text-sm text-muted">
+            {q.examples.map((ex, k) => (
+              <li key={k}>예시: {ex}</li>
+            ))}
+          </ul>
+          <textarea
+            className="mt-3 min-h-28 w-full resize-y rounded-lg border border-line bg-white px-3 py-2.5 leading-relaxed outline-none focus:border-ink disabled:bg-paper"
+            placeholder="우리 반 이야기를 적어 주세요"
+            maxLength={ANSWER_MAX}
+            value={text.answers[i]}
+            disabled={closed}
+            onChange={(e) => setAnswer(i, e.target.value)}
+          />
+          <p className="mt-1 text-right text-xs text-muted">
+            {text.answers[i].length}/{ANSWER_MAX}
+          </p>
+        </section>
+      ))}
+
+      <section className="mt-4 rounded-2xl border border-line bg-card p-5 shadow-sm">
+        <h2 className="font-bold">📷 {grade}학년 단체사진 제출</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{PHOTO_GUIDE}</p>
+        <p className="mt-1 text-xs text-muted">사진은 교지 편집부 선생님만 볼 수 있어요. 사진 한 장은 30MB까지 올릴 수 있어요.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {(Object.keys(PHOTO_KINDS) as PhotoKind[]).map((kind) => (
+            <PhotoSlot
+              key={kind}
+              grade={grade}
+              classNo={classNo}
+              kind={kind}
+              meta={photos[kind]}
+              disabled={closed}
+              onDone={(r) => {
+                setPhotos({ official: r.photo_official, free: r.photo_free });
+                setUpdatedAt(r.updated_at);
+              }}
+            />
+          ))}
+        </div>
+      </section>
+
+      {!closed && (
+        <div className="fixed inset-x-0 bottom-0 border-t border-line bg-card/95 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+            <div className="min-w-0 flex-1 text-sm">
+              {conflict ? (
+                <span className="text-accent">다른 사람이 먼저 저장했어요. 아래에서 골라 주세요.</span>
+              ) : message ? (
+                <span className={message.kind === 'ok' ? 'text-ok' : 'text-accent'}>{message.text}</span>
+              ) : dirty ? (
+                <span className="text-accent">저장하지 않은 내용이 있어요.</span>
+              ) : (
+                <span className="text-muted">답변 {answeredCount}/6 · 사진 {(photos.official ? 1 : 0) + (photos.free ? 1 : 0)}/2</span>
+              )}
+            </div>
+            <button
+              onClick={() => save(false)}
+              disabled={saving || !dirty}
+              className="shrink-0 rounded-xl bg-accent px-5 py-3 font-bold text-white shadow transition disabled:opacity-40"
+            >
+              {saving ? '저장 중…' : '저장하기'}
+            </button>
+          </div>
+          {conflict && (
+            <div className="mx-auto flex max-w-3xl flex-wrap gap-2 px-4 pb-3">
+              <button className="rounded-lg bg-ink px-3 py-2 text-sm text-white" onClick={() => save(true)}>
+                내가 쓴 내용으로 덮어쓰기
+              </button>
+              <button
+                className="rounded-lg border border-line bg-white px-3 py-2 text-sm"
+                onClick={() => {
+                  applyServer(conflict);
+                  setConflict(null);
+                  setMessage({ kind: 'ok', text: '최신 내용을 불러왔어요.' });
+                }}
+              >
+                최신 내용 불러오기 (내 수정은 버림)
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-sm font-medium text-muted">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function Banner({ tone, children }: { tone: 'info' | 'error'; children: React.ReactNode }) {
+  return (
+    <div
+      className={`mt-4 rounded-xl border px-4 py-3 text-sm ${
+        tone === 'error' ? 'border-accent/30 bg-accent-soft text-accent' : 'border-line bg-white text-ink'
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function PhotoSlot({
+  grade,
+  classNo,
+  kind,
+  meta,
+  disabled,
+  onDone,
+}: {
+  grade: number;
+  classNo: number;
+  kind: PhotoKind;
+  meta: PhotoMeta;
+  disabled: boolean;
+  onDone: (r: Resp) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [error, setError] = useState('');
+
+  const onFile = async (file: File | undefined) => {
+    if (!file) return;
+    setError('');
+    if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) {
+      setError('JPG, PNG, WEBP, HEIC 사진만 올릴 수 있어요.');
+      return;
+    }
+    if (file.size > 30 * 1024 * 1024) {
+      setError('사진이 30MB보다 커요.');
+      return;
+    }
+    const ext = file.type === 'image/jpeg' ? 'jpg' : file.type.split('/')[1];
+    setProgress(0);
+    try {
+      const blob = await upload(`photos/${grade}-${classNo}/${kind}/photo.${ext}`, file, {
+        access: 'private',
+        handleUploadUrl: '/api/upload',
+        clientPayload: JSON.stringify({ grade, classNo, kind }),
+        multipart: file.size > 8 * 1024 * 1024,
+        onUploadProgress: (p) => setProgress(Math.round(p.percentage)),
+      });
+      const res = await fetch(`/api/responses/${grade}/${classNo}/photo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind, pathname: blob.pathname, name: file.name }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error);
+      onDone(d.response);
+    } catch (e: any) {
+      setError(e?.message?.includes('마감') ? e.message : '사진을 올리지 못했어요. 다시 시도해 주세요.');
+    } finally {
+      setProgress(null);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className={`rounded-xl border p-4 ${meta ? 'border-ok/40 bg-ok-soft' : 'border-dashed border-line bg-white'}`}>
+      <p className="font-bold">{PHOTO_KINDS[kind]}</p>
+      {meta ? (
+        <p className="mt-1 break-all text-sm text-ok">
+          ✓ 올림: {meta.name} ({fmtSize(meta.size)})
+        </p>
+      ) : (
+        <p className="mt-1 text-sm text-muted">아직 올리지 않았어요.</p>
+      )}
+      {progress !== null ? (
+        <div className="mt-3">
+          <div className="h-2 overflow-hidden rounded-full bg-line">
+            <div className="h-full bg-accent transition-all" style={{ width: `${progress}%` }} />
+          </div>
+          <p className="mt-1 text-xs text-muted">올리는 중… {progress}%</p>
+        </div>
+      ) : (
+        !disabled && (
+          <button
+            onClick={() => inputRef.current?.click()}
+            className="mt-3 rounded-lg border border-line bg-white px-3 py-2 text-sm font-medium hover:border-ink"
+          >
+            {meta ? '다른 사진으로 바꾸기' : '사진 올리기'}
+          </button>
+        )
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+        className="hidden"
+        onChange={(e) => onFile(e.target.files?.[0])}
+      />
+      {error && <p className="mt-2 text-sm text-accent">{error}</p>}
+    </div>
+  );
+}
