@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-14T05:11:26.110Z",
+  "at": "2026-10-14T05:34:08.234Z",
   "url": "https://class-form.vercel.app",
   "reachable": true,
   "results": [
@@ -24,7 +24,7 @@
         "header": "content-security-policy",
         "value": null,
         "validation": "누락",
-        "observedAt": "2026-10-14T05:11:25.115Z"
+        "observedAt": "2026-10-14T05:34:07.067Z"
       }
     },
     {
@@ -35,7 +35,7 @@
         "header": "strict-transport-security",
         "value": "max-age=63072000; includeSubDomains; preload",
         "validation": "valid",
-        "observedAt": "2026-10-14T05:11:25.115Z"
+        "observedAt": "2026-10-14T05:34:07.067Z"
       }
     },
     {
@@ -46,7 +46,7 @@
         "header": "x-frame-options",
         "value": "DENY",
         "validation": "x-frame-options: DENY",
-        "observedAt": "2026-10-14T05:11:25.115Z"
+        "observedAt": "2026-10-14T05:34:07.067Z"
       }
     },
     {
@@ -57,7 +57,7 @@
         "header": "x-content-type-options",
         "value": "nosniff",
         "validation": "valid",
-        "observedAt": "2026-10-14T05:11:25.115Z"
+        "observedAt": "2026-10-14T05:34:07.067Z"
       }
     },
     {
@@ -68,7 +68,7 @@
         "header": "referrer-policy",
         "value": "strict-origin-when-cross-origin",
         "validation": "valid",
-        "observedAt": "2026-10-14T05:11:25.115Z"
+        "observedAt": "2026-10-14T05:34:07.067Z"
       }
     },
     {
@@ -79,7 +79,7 @@
         "header": "permissions-policy",
         "value": "camera=(), microphone=(), geolocation=()",
         "validation": "valid",
-        "observedAt": "2026-10-14T05:11:25.115Z"
+        "observedAt": "2026-10-14T05:34:07.067Z"
       }
     },
     {
@@ -126,8 +126,8 @@
     },
     {
       "id": "info.secret-exposed",
-      "status": "unknown",
-      "observed": "받은 본문에서 민감정보가 확인되지 않았습니다. 일부 추가 경로는 확인하지 못했습니다.",
+      "status": "pass",
+      "observed": "확인한 본문과 경로에서 비공개 인증정보가 발견되지 않았습니다.",
       "evidence": {
         "probed": [
           {
@@ -185,34 +185,34 @@
             "checked": true
           },
           {
-            "path": "/_next/static/immutable/chunks/1-11mn11o1rcd.js",
+            "path": "/_next/static/immutable/chunks/3o2-2leoesnao.js",
             "httpStatus": 200,
             "exposed": false,
             "checked": true
           },
           {
             "path": "/_next/static/immutable/chunks/2wf8q9sucf6ll.js",
-            "httpStatus": 403,
+            "httpStatus": 200,
             "exposed": false,
-            "checked": false
+            "checked": true
           },
           {
             "path": "/_next/static/immutable/chunks/turbopack-1cvbnb3nlabgn.js",
-            "httpStatus": 403,
+            "httpStatus": 200,
             "exposed": false,
-            "checked": false
+            "checked": true
           },
           {
             "path": "/_next/static/immutable/chunks/00z4pmesk2f4f.js",
-            "httpStatus": 403,
+            "httpStatus": 200,
             "exposed": false,
-            "checked": false
+            "checked": true
           },
           {
-            "path": "/_next/static/immutable/chunks/31iyiq9vi9nt0.js",
-            "httpStatus": 403,
+            "path": "/_next/static/immutable/chunks/3d1utm4gw8nrj.js",
+            "httpStatus": 200,
             "exposed": false,
-            "checked": false
+            "checked": true
           }
         ],
         "exposedPaths": [],
@@ -222,7 +222,7 @@
     },
     {
       "id": "info.config-exposed",
-      "status": "unknown",
+      "status": "pass",
       "observed": "추가로 확인된 설정 자료가 없습니다.",
       "evidence": {
         "exposed": []
@@ -320,9 +320,9 @@
     {
       "id": "perf.ttfb",
       "status": "pass",
-      "observed": "응답 시간 168ms",
+      "observed": "응답 시간 147ms",
       "evidence": {
-        "ms": 168
+        "ms": 147
       }
     },
     {
@@ -330,7 +330,7 @@
       "status": "pass",
       "observed": "문서 크기 12KB",
       "evidence": {
-        "bytes": 11972
+        "bytes": 12711
       }
     },
     {
@@ -370,7 +370,7 @@
       "observed": "하드코딩 시크릿 미검출",
       "evidence": {
         "hits": [],
-        "inspectedFiles": 37,
+        "inspectedFiles": 39,
         "readFailures": 0
       }
     },
@@ -380,7 +380,7 @@
       "observed": "클라 시크릿 노출 미검출",
       "evidence": {
         "hits": [],
-        "inspectedFiles": 30,
+        "inspectedFiles": 32,
         "readFailures": 0
       }
     },
@@ -431,8 +431,8 @@
       "unsafeTransport": false,
       "bodyTruncated": false
     },
-    "scannedAt": "2026-10-14T05:11:25.113Z",
-    "ttfbMs": 168,
+    "scannedAt": "2026-10-14T05:34:07.065Z",
+    "ttfbMs": 147,
     "observedHeaders": [
       "access-control-allow-origin",
       "age",
@@ -483,7 +483,7 @@
             "header": "content-security-policy",
             "value": null,
             "validation": "누락",
-            "observedAt": "2026-10-14T05:11:25.115Z"
+            "observedAt": "2026-10-14T05:34:07.067Z"
           }
         },
         {
@@ -494,7 +494,7 @@
             "header": "strict-transport-security",
             "value": "max-age=63072000; includeSubDomains; preload",
             "validation": "valid",
-            "observedAt": "2026-10-14T05:11:25.115Z"
+            "observedAt": "2026-10-14T05:34:07.067Z"
           }
         },
         {
@@ -505,7 +505,7 @@
             "header": "x-frame-options",
             "value": "DENY",
             "validation": "x-frame-options: DENY",
-            "observedAt": "2026-10-14T05:11:25.115Z"
+            "observedAt": "2026-10-14T05:34:07.067Z"
           }
         },
         {
@@ -516,7 +516,7 @@
             "header": "x-content-type-options",
             "value": "nosniff",
             "validation": "valid",
-            "observedAt": "2026-10-14T05:11:25.115Z"
+            "observedAt": "2026-10-14T05:34:07.067Z"
           }
         },
         {
@@ -527,7 +527,7 @@
             "header": "referrer-policy",
             "value": "strict-origin-when-cross-origin",
             "validation": "valid",
-            "observedAt": "2026-10-14T05:11:25.115Z"
+            "observedAt": "2026-10-14T05:34:07.067Z"
           }
         },
         {
@@ -538,7 +538,7 @@
             "header": "permissions-policy",
             "value": "camera=(), microphone=(), geolocation=()",
             "validation": "valid",
-            "observedAt": "2026-10-14T05:11:25.115Z"
+            "observedAt": "2026-10-14T05:34:07.067Z"
           }
         },
         {
@@ -585,8 +585,8 @@
         },
         {
           "id": "info.secret-exposed",
-          "status": "unknown",
-          "observed": "받은 본문에서 민감정보가 확인되지 않았습니다. 일부 추가 경로는 확인하지 못했습니다.",
+          "status": "pass",
+          "observed": "확인한 본문과 경로에서 비공개 인증정보가 발견되지 않았습니다.",
           "evidence": {
             "probed": [
               {
@@ -644,34 +644,34 @@
                 "checked": true
               },
               {
-                "path": "/_next/static/immutable/chunks/1-11mn11o1rcd.js",
+                "path": "/_next/static/immutable/chunks/3o2-2leoesnao.js",
                 "httpStatus": 200,
                 "exposed": false,
                 "checked": true
               },
               {
                 "path": "/_next/static/immutable/chunks/2wf8q9sucf6ll.js",
-                "httpStatus": 403,
+                "httpStatus": 200,
                 "exposed": false,
-                "checked": false
+                "checked": true
               },
               {
                 "path": "/_next/static/immutable/chunks/turbopack-1cvbnb3nlabgn.js",
-                "httpStatus": 403,
+                "httpStatus": 200,
                 "exposed": false,
-                "checked": false
+                "checked": true
               },
               {
                 "path": "/_next/static/immutable/chunks/00z4pmesk2f4f.js",
-                "httpStatus": 403,
+                "httpStatus": 200,
                 "exposed": false,
-                "checked": false
+                "checked": true
               },
               {
-                "path": "/_next/static/immutable/chunks/31iyiq9vi9nt0.js",
-                "httpStatus": 403,
+                "path": "/_next/static/immutable/chunks/3d1utm4gw8nrj.js",
+                "httpStatus": 200,
                 "exposed": false,
-                "checked": false
+                "checked": true
               }
             ],
             "exposedPaths": [],
@@ -681,7 +681,7 @@
         },
         {
           "id": "info.config-exposed",
-          "status": "unknown",
+          "status": "pass",
           "observed": "추가로 확인된 설정 자료가 없습니다.",
           "evidence": {
             "exposed": []
@@ -779,9 +779,9 @@
         {
           "id": "perf.ttfb",
           "status": "pass",
-          "observed": "응답 시간 168ms",
+          "observed": "응답 시간 147ms",
           "evidence": {
-            "ms": 168
+            "ms": 147
           }
         },
         {
@@ -789,7 +789,7 @@
           "status": "pass",
           "observed": "문서 크기 12KB",
           "evidence": {
-            "bytes": 11972
+            "bytes": 12711
           }
         },
         {
@@ -829,7 +829,7 @@
           "observed": "하드코딩 시크릿 미검출",
           "evidence": {
             "hits": [],
-            "inspectedFiles": 37,
+            "inspectedFiles": 39,
             "readFailures": 0
           }
         },
@@ -839,7 +839,7 @@
           "observed": "클라 시크릿 노출 미검출",
           "evidence": {
             "hits": [],
-            "inspectedFiles": 30,
+            "inspectedFiles": 32,
             "readFailures": 0
           }
         },
@@ -879,8 +879,8 @@
       ],
       "blockingFails": [],
       "coverage": {
-        "checked": 28,
-        "unverified": 7,
+        "checked": 30,
+        "unverified": 5,
         "notApplicable": 1
       },
       "policyVersion": "minimum-2026-09-15",

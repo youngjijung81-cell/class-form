@@ -32,6 +32,22 @@
         },
         "blocking": []
       }
+    },
+    {
+      "n": 3,
+      "at": "2026-10-14T05:34:08.233Z",
+      "security": {
+        "score": null,
+        "grade": null,
+        "eligible": true,
+        "outcome": "eligible",
+        "coverage": {
+          "checked": 30,
+          "unverified": 5,
+          "notApplicable": 1
+        },
+        "blocking": []
+      }
     }
   ],
   "items": {
@@ -108,15 +124,15 @@
       "regressed": false
     },
     "info.secret-exposed": {
-      "status": "unknown",
+      "status": "pass",
       "firstFailRound": null,
-      "fixedRound": null,
+      "fixedRound": 3,
       "regressed": false
     },
     "info.config-exposed": {
-      "status": "unknown",
+      "status": "pass",
       "firstFailRound": null,
-      "fixedRound": null,
+      "fixedRound": 3,
       "regressed": false
     },
     "info.source-map": {
